@@ -1,0 +1,7 @@
+setup.py
+images2gif/__init__.py
+images2gif/images2gif.py
+images2gif.egg-info/PKG-INFO
+images2gif.egg-info/SOURCES.txt
+images2gif.egg-info/dependency_links.txt
+images2gif.egg-info/top_level.txt

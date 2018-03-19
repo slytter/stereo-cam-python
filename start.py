@@ -1,13 +1,26 @@
-print('smagen')
-from io import BytesIO
 import imageio
+import requests
+import datetime, time
+import os
 
-im = imageio.imread('http://upload.wikimedia.org/wikipedia/commons/d/de/Wikipedia_Logo_1.0.png')  # read a standard image
+def downloadAndTakeImages(downloads, _fps) :
+    paths = []
+    timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    basePath = 'images/' + str(timeStamp)
+    os.makedirs(basePath, exist_ok=True)
 
-filenames = ['test.jpg', 'test2.png']
+    for i in range(0,len(download)) :
+        img_data = requests.get(download[i]).content
+        path = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'
+        paths.append(path)
+        with open(path, 'wb') as handler:
+            handler.write(img_data)
 
-images = []
-for filename in filenames:
-    images.append(imageio.imread(filename))
+    images = []
+    for filename in paths:
+        images.append(imageio.imread(filename))
 
-imageio.mimsave('movie.gif', images)
+    imageio.mimsave(basePath + '/compiled.gif', images,fps=_fps)
+
+download = ['https://i1.sndcdn.com/artworks-000319237989-ooxmoa-t500x500.jpg', 'https://i1.sndcdn.com/artworks-000319389714-9u4dgh-t500x500.jpg']
+downloadAndTakeImages(download, 10)

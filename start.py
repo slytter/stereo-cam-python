@@ -7,7 +7,7 @@ def downloadAndTakeImages(downloads, _fps) :
     paths = []
     timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     basePath = 'images/' + str(timeStamp)
-    os.makedirs(basePath, exist_ok=True)
+    os.makedirs(basePath)
 
     for i in range(0,len(download)) :
         img_data = requests.get(download[i]).content

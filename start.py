@@ -7,7 +7,7 @@ def downloadAndTakeImages(downloads, _fps) :
     paths = []
     timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     basePath = 'images/' + str(timeStamp)
-    os.makedirs(basePath, exist_ok=True)
+    os.makedirs(basePath)
 
 
 

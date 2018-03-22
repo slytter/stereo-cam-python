@@ -9,12 +9,18 @@ def downloadAndTakeImages(downloads, _fps) :
     basePath = 'images/' + str(timeStamp)
     os.makedirs(basePath)
 
-    for i in range(0,len(download)) :
-        img_data = requests.get(download[i]).content
+
+
+# is sync... should be async: https://stackoverflow.com/questions/18377475/asynchronously-get-and-store-images-in-python
+# second answer using grequest
+    for i in range(0,len(downloads)) :
+        img_data = requests.get(downloads[i]).content
+        print("requesting image")
         path = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'
         paths.append(path)
         with open(path, 'wb') as handler:
             handler.write(img_data)
+            print("writing image")
 
     images = []
     for filename in paths:

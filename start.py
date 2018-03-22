@@ -9,8 +9,6 @@ def downloadAndTakeImages(downloads, _fps) :
     basePath = 'images/' + str(timeStamp)
     os.makedirs(basePath)
 
-
-
 # is sync... should be async: https://stackoverflow.com/questions/18377475/asynchronously-get-and-store-images-in-python
 # second answer using grequest
     for i in range(0,len(downloads)) :
@@ -29,7 +27,6 @@ def downloadAndTakeImages(downloads, _fps) :
     imageio.mimsave(basePath + '/compiled.gif', images,fps=_fps)
 
 download = ['https://i1.sndcdn.com/artworks-000319237989-ooxmoa-t500x500.jpg', 'https://i1.sndcdn.com/artworks-000319389714-9u4dgh-t500x500.jpg']
-
 
 
 class Connection : 
@@ -68,3 +65,5 @@ def checkPing(connections) :
         
 
 checkPing(connections)
+
+realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']

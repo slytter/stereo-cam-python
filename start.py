@@ -29,4 +29,42 @@ def downloadAndTakeImages(downloads, _fps) :
     imageio.mimsave(basePath + '/compiled.gif', images,fps=_fps)
 
 download = ['https://i1.sndcdn.com/artworks-000319237989-ooxmoa-t500x500.jpg', 'https://i1.sndcdn.com/artworks-000319389714-9u4dgh-t500x500.jpg']
-downloadAndTakeImages(download, 10)
+
+
+
+class Connection : 
+    ip = ''
+    port = ''
+    ping = 0
+    status = False
+    
+    def __init__ (self, _ip, _port):
+        self.ip = _ip
+        self.port = _port
+    
+    def updateConnection(self) :
+        connection = True
+        newPing = 10
+        if(self.ping == connection) : # psuedo check for ping and return true if connection up.
+            self.ping = (self.ping + newPing) / 2 # moving average thing
+            self.status = True
+            print('Connection up for ' + self.ip + 'with ping: ' + self.ping)
+            return True
+        else : 
+            self.status = False
+            print('Connection could not be established to ' + self.ip)
+            return False
+        
+
+
+connections = []
+connections.append(Connection('https://i1.sndcdn.com/artworks-000319237989-ooxmoa-t500x500.jpg', '3000'))
+connections.append(Connection('https://i1.sndcdn.com/artworks-000319389714-9u4dgh-t500x500.jpg', '3000'))
+
+
+def checkPing(connections) : 
+    for connection in connections :
+        connection.updateConnection()
+        
+
+checkPing(connections)

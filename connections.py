@@ -1,6 +1,6 @@
 import os, platform, time
 import shlex  
-from latencyTest.latencyTester import averagePing
+from latencyTester import averagePing
 from subprocess import Popen, PIPE, STDOUT
 
 class Connection : # place this in another doc please..

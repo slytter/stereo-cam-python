@@ -14,9 +14,12 @@ def downloadImages(cons, _fps) :
 	ips = map(lambda con: con.ip + con.port + '?delay=' + str(con.reversedPing), cons) # reversed pings instead of pings
 	# for ip in ips:   
 	#     print(ip)
-	requests = (grequests.get(ip) for ip in ips)
-	responses = grequests.map(requests)
 
+	requests = (grequests.get(ip) for ip in ips)
+
+	responses = grequests.map(requests)
+	for response in responses:
+		print(response)
 	i = 0 
 	for response in responses:
 		if 199 < response.status_code < 400:

@@ -22,7 +22,7 @@ def connectAndDownload():
 		status = connections.pingConnections(cons, pingAccuracy)
 		connectAndDownload()
 
-
+# should be threaded or async
 def loop():
 	time.sleep(1)
 	print('loop')

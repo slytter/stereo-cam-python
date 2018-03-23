@@ -30,8 +30,9 @@ class Connection : # place this in another doc please..
 
 
 
-def checkPing(connections, accuracy) : 
+def pingConnections(connections, accuracy) : 
 	anyConnectionDown = 1
+	longestPing = 0
 	while (anyConnectionDown > 0) :
 		print('Trying to connect to slaves')
 		anyConnectionDown = 0
@@ -39,12 +40,19 @@ def checkPing(connections, accuracy) :
 		for connection in connections :
 			if(connection.updateConnection(accuracy) == False):
 				anyConnectionDown += 1
+			else:
+				if connection.ping > longestPing :
+					longestPing = connection.ping
 		
 		if(anyConnectionDown > 0):
 			print(str(anyConnectionDown) + ' connection down. Re-pinging in 1 second')
 			time.sleep(1)
 		else:
 			#calculate reverse ping (largest_ping - ping for each ping in pings)
+			print('longest ping: ' + str(longestPing))
+			for connection in connections:
+				connection.reversedPing = longestPing - connection.ping
+				
 			return True
 	
 	return True

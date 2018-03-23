@@ -10,12 +10,12 @@ cons = []
 cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
-status = connections.checkPing(cons, pingAccuracy)
+status = connections.pingConnections(cons, pingAccuracy)
 
 if(downloadImages(cons, 10)):
 	print('Succesfully downloaded and compiled')
 else: 
 	print('Download error. Re-pinging slaves')
 	status = False
-	status = connections.checkPing(cons, pingAccuracy)
+	status = connections.pingConnections(cons, pingAccuracy)
 

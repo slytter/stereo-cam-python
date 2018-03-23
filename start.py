@@ -2,19 +2,20 @@ import connections
 from connections import Connection
 from downloadImages import downloadImages 
 status = False
-
+pingAccuracy = 3
 # realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
+# realIps = ['slave1.local', 'master.local']
 
 cons = []
-cons.append(Connection('https://i1.sndcdn.com/', 'artworks-000319237989-ooxmoa-t500x500.jpg'))
-cons.append(Connection('https://i1.sndcdn.com/', 'artworks-000319389714-9u4dgh-t500x500.jpg'))
+cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
+cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
-status = connections.checkPing(cons)
+status = connections.checkPing(cons, pingAccuracy)
 
 if(downloadImages(cons, 10)):
     print('Succesfully downloaded and compiled')
 else: 
     print('Download error. Re-pinging slaves')
     status = False
-    status = connections.checkPing(cons)
+    status = connections.checkPing(cons, pingAccuracy)
 

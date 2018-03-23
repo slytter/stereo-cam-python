@@ -17,7 +17,7 @@ def downloadImages(cons, _fps) :
 	requests = (grequests.get(ip) for ip in ips)
 	responses = grequests.map(requests)
 
-	i = 0
+	i = 0 
 	for response in responses:
 		if 199 < response.status_code < 400:
 			name = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'

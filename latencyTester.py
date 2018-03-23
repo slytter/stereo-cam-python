@@ -2,8 +2,8 @@ import os, sys, pexpect, time, datetime
 
 def averagePing(ping_destination, amount) :
 	# SET YOUR PING RESPONSE TIME THRESHOLD HERE, IN MILLISECONDS
-	threshold = 250
-	interval = 0.1
+	threshold = 1250
+	interval = 0.25
 	ping_destination = ping_destination.replace("http://","") # removing http:// from the string since its not supported in ping
 	count = 0
 	line = 'Ping Interval: ' + str(interval) + ', Destination: ' + ping_destination + ', Threshold to Log (msec): ' + str(threshold) + '\n'

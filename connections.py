@@ -5,6 +5,7 @@ class Connection : # place this in another doc please..
     port = ''
     ping = 0
     status = False
+    reversedPing = 0
     
     def __init__ (self, _ip, _port):
         self.ip = _ip
@@ -36,6 +37,9 @@ def checkPing(connections) :
                 anyConnectionDown += 1
         if(anyConnectionDown > 0):
             time.sleep(1)
+        else:
+            #calculate reverse ping (largest_ping - ping for each ping in pings)
+            return True
     
     return True
 

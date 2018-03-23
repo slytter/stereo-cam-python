@@ -11,7 +11,7 @@ def downloadImages(cons, _fps) :
     os.makedirs(basePath)
 
     print('Requesting')
-    ips = map(lambda con: con.ip + con.port + '?ping=' + str(con.ping), cons)
+    ips = map(lambda con: con.ip + con.port + '?delay=' + str(con.reversedPing), cons) # reversed pings instead of pings
     requests = (grequests.get(ip) for ip in ips)
     responses = grequests.map(requests)
 
@@ -26,6 +26,7 @@ def downloadImages(cons, _fps) :
             return False
         i += 1
 
+    #images = (imageio.imread(filename) for filename in paths)
     images = []
     for filename in paths:
         images.append(imageio.imread(filename))

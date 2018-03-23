@@ -1,3 +1,3 @@
-from latencyTester.latencyTester import averagePing
+from latencyTest.latencyTester import averagePing
 
 print(averagePing('google.dk', 5))

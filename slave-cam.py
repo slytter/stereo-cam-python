@@ -47,6 +47,7 @@ class Capture:
         print('It took ' + str(time.time()-startTime) + ' to init buffer')
         with picamera.PiCamera() as camera:
             print('It took ' + str(time.time()-startTime) + ' to init camera')
+            camera.rotation = 180
             camera.resolution = (input.w, input.h)
             camera.start_preview()
             print('It took ' + str(time.time()-startTime) + ' to set res and preview')
@@ -60,4 +61,3 @@ class Capture:
         web.header('Content-Type', 'image/jpg')
         print('It took ' + str(time.time()-startTime) + ' to finish')
         return stream.read()
-        #return open('0.jpg',"rb").read()          # read image from file and respond

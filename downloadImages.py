@@ -1,9 +1,10 @@
 import imageio
 import datetime, time, os
 import grequests
-
+import time
 
 def downloadImages(cons, _fps) :
+	startTime = time.time()
 	paths = []
 
 	timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
@@ -13,10 +14,9 @@ def downloadImages(cons, _fps) :
 	print('Requesting')
 	ips = map(lambda con: con.ip + con.port + '?delay=' + str(con.reversedPing), cons) # reversed pings instead of pings
 #	for ip in ips:   
-#Å		print(ip)
+#		print(ip)
 
 	requests = (grequests.get(ip, timeout = 10) for ip in ips)
-
 	responses = grequests.map(requests)
 	for response in responses:
 		print(response)
@@ -30,7 +30,7 @@ def downloadImages(cons, _fps) :
 		else:
 			return False
 		i += 1
-
+	print('It took ' + str(time.time()-startTime) + 'to download images')
 	images = []
 	for filename in paths:
 		images.append(imageio.imread(filename))

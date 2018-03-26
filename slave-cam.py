@@ -40,15 +40,15 @@ class Capture:
             input.h = max(0,min(1944, input.h))         # clamp to range of valid values
 
         #camera = picamera.PiCamera()                    # camera
-        #camera.resolution = (input.w, input.h)
         #camera.capture('picture.jpg')                   # capture image to file
         #camera.close()
 
         # Create the in-memory stream
         stream = io.BytesIO()
         with picamera.PiCamera() as camera:
+            camera.resolution = (input.w, input.h)
             camera.start_preview()
-            time.sleep(2)
+            time.sleep(1)
             camera.capture(stream, format='jpeg')
         # "Rewind" the stream to the beginning so we can read its content
         stream.seek(0)

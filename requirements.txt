@@ -20,3 +20,5 @@ ruamel.yaml==0.11.7
 six==1.10.0
 urllib3==1.21.1
 web.py==0.39
+pexpect==4.2.1
+ptyprocess==0.5.1

@@ -8,8 +8,11 @@ pingAccuracy = 3
 # realIps = ['slave1.local', 'master.local']
 
 cons = []
-cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
-cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
+
+cons.append(Connection('http://master.local', ':3000'))
+cons.append(Connection('http://slave1.local', ':3000'))
+#cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
+#cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
 status = connections.pingConnections(cons, pingAccuracy)
 
@@ -21,6 +24,8 @@ def connectAndDownload():
 		global status 
 		status = connections.pingConnections(cons, pingAccuracy)
 		connectAndDownload()
+
+connectAndDownload()
 
 # should be threaded or async
 def loop():

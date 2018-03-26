@@ -9,7 +9,7 @@ pingAccuracy = 3
 
 cons = []
 
-#cons.append(Connection('http://master.local', ':3000'))
+cons.append(Connection('http://master.local', ':8080/capture'))
 cons.append(Connection('http://slave1.local', ':8080/capture'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))

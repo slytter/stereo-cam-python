@@ -2,7 +2,7 @@ import web
 import io
 import time
 from PIL import Image
-#import picamera
+import picamera
 
 urls = (
     '/capture', 'Capture'
@@ -22,7 +22,7 @@ class Capture:
     def GET(self):
         startTime = time.time()
 
-        input = web.input(w="0", h="0",delay="0")                 # reading user input of resolution values for 
+        input = web.input(w="0", h="0", delay="0")                 # reading user input of resolution values for 
 
         input.w = int(input.w)                          # to integer
         input.h = int(input.h)
@@ -42,11 +42,7 @@ class Capture:
         else:
             input.h = max(0,min(1944, input.h))         # clamp to range of valid values
 
-        #camera = picamera.PiCamera()                    # camera
-        #camera.capture('picture.jpg')                   # capture image to file
-        #camera.close()
         print('It took ' + str(time.time()-startTime) + ' to init request (with or without delay)')
-        # Create the in-memory stream
         stream = io.BytesIO()
         print('It took ' + str(time.time()-startTime) + ' to init buffer')
         with picamera.PiCamera() as camera:

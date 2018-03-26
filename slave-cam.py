@@ -2,7 +2,7 @@ import web
 import io
 import time
 from PIL import Image
-#import picamera
+import picamera
 
 urls = (
     '/capture', 'Capture'

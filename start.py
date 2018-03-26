@@ -9,28 +9,24 @@ pingAccuracy = 3
 
 cons = []
 
-cons.append(Connection('http://master.local', ':3000'))
-cons.append(Connection('http://slave1.local', ':3000'))
+#cons.append(Connection('http://master.local', ':3000'))
+cons.append(Connection('http://slave1.local', ':8080/capture'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
 status = connections.pingConnections(cons, pingAccuracy)
 
 def connectAndDownload():
+	started = time.time()
+	print('Starting requests')
 	if(downloadImages(cons, 10)):
-		print('Succesfully downloaded and compiled')
+		print('Succesfully downloaded and compiled. It took: ' + str(time.time()-started) + ' secs')
 	else: 
 		print('Download error. Re-pinging slaves')
 		global status 
 		status = connections.pingConnections(cons, pingAccuracy)
-		connectAndDownload()
+
 
 connectAndDownload()
 
 # should be threaded or async
-def loop():
-	time.sleep(1)
-	print('loop')
-	loop()
-
-loop()

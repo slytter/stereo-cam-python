@@ -23,7 +23,7 @@ class Capture:
 
         input.w = int(input.w)                          # to integer
         input.h = int(input.h)
-        input.delay = int(input.delay)
+        input.delay = float(input.delay)
 
         if(input.delay != 0):
             print('delaying image caputure by' + str(input.delay))

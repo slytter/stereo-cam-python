@@ -2,7 +2,8 @@ import imageio
 import datetime, time, os
 import grequests
 import time
-from start import turnOffLED
+import RPi.GPIO as GPIO
+
 def downloadImages(cons, _fps) :
 	startTime = time.time()
 	paths = []
@@ -32,7 +33,7 @@ def downloadImages(cons, _fps) :
 			return False
 		i += 1
 	print('It took ' + str(time.time()-startTime) + 'to download images')
-	turnOffLED()
+	GPIO.output(27, GPIO.LOW)
 	images = []
 	for filename in paths:
 		images.append(imageio.imread(filename))

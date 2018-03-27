@@ -21,6 +21,7 @@ def downloadImages(cons, _fps) :
 	for response in responses:
 		print(response)
 	i = 0 
+	starting = time.time()
 	for response in responses:
 		if 199 < response.status_code < 400:
 			name = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'
@@ -35,5 +36,5 @@ def downloadImages(cons, _fps) :
 	for filename in paths:
 		images.append(imageio.imread(filename))
 
-	imageio.mimsave(basePath + '/compiled.gif', images,fps=_fps)
+	imageio.mimsave(basePath + '/compiled.gif', images, fps=_fps)
 	return True

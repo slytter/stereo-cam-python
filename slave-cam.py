@@ -52,7 +52,7 @@ class Capture:
             camera.start_preview()
             print('It took ' + str(time.time()-startTime) + ' to set res and preview')
 
-            time.sleep(1)
+            time.sleep(1.0 - (time.time()-startTime)) # delay compensation is withheld from the camera focus time
             camera.capture(stream, format='jpeg')
             print('It took ' + str(time.time()-startTime) + ' to capture into stream (with preview sleep time)')
 

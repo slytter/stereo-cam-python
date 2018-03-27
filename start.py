@@ -49,10 +49,6 @@ pwm.start(dc)
 
 
 
-def turnOffLED():
-	GPIO.output(ledPin, GPIO.LOW)
-    
-
 print("Here we go! Press CTRL+C to exit")
 try:
 	while 1:

@@ -2,6 +2,8 @@ import connections
 from connections import Connection
 from downloadImages import downloadImages 
 import time
+import RPi.GPIO as GPIO
+
 status = False
 pingAccuracy = 4
 # realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
@@ -27,11 +29,6 @@ def connectAndDownload():
 		global status
 		status = connections.pingConnections(cons, pingAccuracy)
 
-
-# External module imports
-import RPi.GPIO as GPIO
-import time
-
 # Pin Definitons:
 pwmPin = 18 # Broadcom pin 18 (P1 pin 12)
 ledPin = 27# Broadcom pin 23 (P1 pin 16)
@@ -50,6 +47,12 @@ GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input 
 GPIO.output(ledPin, GPIO.LOW)
 pwm.start(dc)
 
+
+
+def turnOffLED():
+	GPIO.output(ledPin, GPIO.LOW)
+    
+
 print("Here we go! Press CTRL+C to exit")
 try:
 	while 1:
@@ -60,8 +63,10 @@ try:
 			pwm.ChangeDutyCycle(100-dc)
 			GPIO.output(ledPin, GPIO.HIGH)
 			connectAndDownload()
-			GPIO.output(ledPin, GPIO.LOW)
+			GPIO.output(ledPin, GPIO.HIGH)
 			time.sleep(0.075)
+			GPIO.output(ledPin, GPIO.LOW)
+			
 except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 	pwm.stop() # stop PWM
 	GPIO.cleanup() # cleanup all GPIO

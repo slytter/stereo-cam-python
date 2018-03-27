@@ -16,6 +16,7 @@ if __name__ == "__main__":
     app = web.application(urls, globals())
     app.run()
 
+
 class Capture:
     def GET(self):
         startTime = time.time()

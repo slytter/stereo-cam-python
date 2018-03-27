@@ -17,7 +17,7 @@ class Connection : # place this in another doc please..
 	def updateConnection(self, accuracy):
 		con = averagePing(self.ip, accuracy)
 		if(con != False) : # returning false if connection down, and the ping if up
-			self.ping = con/2	
+			self.ping = con / 2
 			self.status = True
 			print('Connection up for ' + self.ip + ' with ping: ' + str(self.ping))
 			return True

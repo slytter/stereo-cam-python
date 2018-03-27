@@ -24,9 +24,11 @@ print("Here we go! Press CTRL+C to exit")
 try:
     while 1:
         if GPIO.input(butPin): # button is released
+            print('ey')
             pwm.ChangeDutyCycle(dc)
             GPIO.output(ledPin, GPIO.LOW)
         else: # button is pressed:
+            print('down')
             pwm.ChangeDutyCycle(100-dc)
             GPIO.output(ledPin, GPIO.HIGH)
             time.sleep(0.075)

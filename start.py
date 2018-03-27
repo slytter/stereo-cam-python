@@ -3,7 +3,7 @@ from connections import Connection
 from downloadImages import downloadImages 
 import time
 status = False
-pingAccuracy = 3
+pingAccuracy = 4
 # realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
 # realIps = ['slave1.local', 'master.local']
 
@@ -16,14 +16,15 @@ cons.append(Connection('http://slave1.local', ':8080/capture'))
 
 status = connections.pingConnections(cons, pingAccuracy)
 
+
 def connectAndDownload():
 	started = time.time()
 	print('Starting requests')
 	if(downloadImages(cons, 10)):
 		print('Succesfully downloaded and compiled. It took: ' + str(time.time()-started) + ' secs')
-	else: 
+	else:
 		print('Download error. Re-pinging slaves')
-		global status 
+		global status
 		status = connections.pingConnections(cons, pingAccuracy)
 
 

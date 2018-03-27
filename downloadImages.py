@@ -23,6 +23,7 @@ def downloadImages(cons, _fps) :
 	i = 0 
 	starting = time.time()
 	for response in responses:
+		
 		if 199 < response.status_code < 400:
 			name = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'
 			paths.append(name)

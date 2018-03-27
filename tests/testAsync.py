@@ -22,11 +22,13 @@ def getter(download, i):
         handler.write(img_data)
         print("writing image")
 
-
 threads = []
+images = []
+images.append('http://master.local:8080/capture')
+images.append('http://slave1.local:8080/capture')
 
 for x in range(0,2):
-    t = threading.Thread(target=getter, args=('http://slytter.tk/photos/project-images/embodied.jpg', x))
+    t = threading.Thread(target=getter, args=(images[x], x))
     t.start()
     threads.append(t)
 # wait for all threads to finish
@@ -35,4 +37,3 @@ for x in range(0,2):
 # They will fatch your urls in the background without
 # blocking your main application.
 map(lambda t: t.join(), threads)
-print('somethinf')

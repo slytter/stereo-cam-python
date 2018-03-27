@@ -13,16 +13,14 @@ width = 1024
 height = 1024
 
 if __name__ == "__main__":
-
     app = web.application(urls, globals())
     app.run()
 
 class Capture:
-
     def GET(self):
         startTime = time.time()
 
-        input = web.input(w="0", h="0", delay="0")                 # reading user input of resolution values for 
+        input = web.input(w="0", h="0", delay="0")      # reading user input of resolution values for 
 
         input.w = int(input.w)                          # to integer
         input.h = int(input.h)
@@ -52,7 +50,7 @@ class Capture:
             camera.start_preview()
             print('It took ' + str(time.time()-startTime) + ' to set res and preview')
 
-            time.sleep(1.0 - (time.time()-startTime)) # delay compensation is withheld from the camera focus time
+            time.sleep(1.0 - (time.time()-startTime)) # delay compensation: - delay is withheld from the camera focus time
             camera.capture(stream, format='jpeg')
             print('It took ' + str(time.time()-startTime) + ' to capture into stream (with preview sleep time)')
 

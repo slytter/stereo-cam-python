@@ -14,11 +14,10 @@ class Connection : # place this in another doc please..
 		self.ip = _ip
 		self.port = _port
 	
-	def updateConnection(self, accuracy) :
+	def updateConnection(self, accuracy):
 		con = averagePing(self.ip, accuracy)
-		#print('connection: ' + str(con))
 		if(con != False) : # returning false if connection down, and the ping if up
-			self.ping = con
+			self.ping = con/2	
 			self.status = True
 			print('Connection up for ' + self.ip + ' with ping: ' + str(self.ping))
 			return True
@@ -27,10 +26,7 @@ class Connection : # place this in another doc please..
 			print('Connection could not be established to ' + self.ip)
 			return False
 
-
-
-
-def pingConnections(connections, accuracy) : 
+def pingConnections(connections, accuracy): 
 	anyConnectionDown = 1
 	longestPing = 0
 	while (anyConnectionDown > 0) :
@@ -48,15 +44,9 @@ def pingConnections(connections, accuracy) :
 			print(str(anyConnectionDown) + ' connection down. Re-pinging in 1 second')
 			time.sleep(1)
 		else:
-			#calculate reverse ping (largest_ping - ping for each ping in pings)
 			print('longest ping: ' + str(longestPing))
 			for connection in connections:
-				connection.reversedPing = longestPing - connection.ping
+				connection.reversedPing = longestPing - connection.ping #calculate reverse ping (largest_ping - ping for each ping in pings)
 				
 			return True
-	
 	return True
-
-
-
-

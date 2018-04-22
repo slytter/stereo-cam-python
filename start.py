@@ -3,7 +3,9 @@ from connections import Connection
 from downloadImages import downloadImages 
 import time
 import RPi.GPIO as GPIO
+import display
 
+lastImagePath = ""
 status = False
 pingAccuracy = 4
 # realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
@@ -12,11 +14,12 @@ pingAccuracy = 4
 cons = []
 
 cons.append(Connection('http://master.local', ':8080/capture'))
-cons.append(Connection('http://slave1.local', ':8080/capture'))
+# cons.append(Connection('http://slave1.local', ':8080/capture'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
 status = connections.pingConnections(cons, pingAccuracy)
+
 
 
 def connectAndDownload():
@@ -28,6 +31,8 @@ def connectAndDownload():
 		print('Download error. Re-pinging slaves')
 		global status
 		status = connections.pingConnections(cons, pingAccuracy)
+
+
 
 # Pin Definitons:
 pwmPin = 18 # Broadcom pin 18 (P1 pin 12)
@@ -62,7 +67,12 @@ try:
 			GPIO.output(ledPin, GPIO.HIGH)
 			time.sleep(0.075)
 			GPIO.output(ledPin, GPIO.LOW)
-			
+			display.displayImageOnDisplay(lastImagePath)
 except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 	pwm.stop() # stop PWM
 	GPIO.cleanup() # cleanup all GPIO
+
+
+def setImagePath(imagePath):
+	global lastImagePath
+	lastImagePath = imagePath

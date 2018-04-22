@@ -3,7 +3,7 @@ import datetime, time, os
 import grequests
 import time
 import RPi.GPIO as GPIO
-
+from start import setImagePath
 def downloadImages(cons, _fps) :
 	startTime = time.time()
 	paths = []
@@ -26,6 +26,7 @@ def downloadImages(cons, _fps) :
 	for response in responses:
 		if 199 < response.status_code < 400:
 			name = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'
+			setImagePath(name)
 			paths.append(name)
 			with open(name, 'wb') as f:
 				f.write(response.content)

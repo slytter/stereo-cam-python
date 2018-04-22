@@ -4,7 +4,7 @@ import time
 
 # Pin Definitons:
 pwmPin = 18 # Broadcom pin 18 (P1 pin 12)
-ledPin = 23 # Broadcom pin 23 (P1 pin 16)
+ledPin = 27 # Broadcom pin 23 (P1 pin 16)
 butPin = 17 # Broadcom pin 17 (P1 pin 11)
 
 dc = 95 # duty cycle (0-100) for PWM pin

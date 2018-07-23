@@ -13,7 +13,7 @@ def downloadImages(cons, _fps) :
 	startTime = time.time()
 	paths = []
 
-	timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+	timeStamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
 	basePath = 'images/' + str(timeStamp)
 	os.makedirs(basePath)
 

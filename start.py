@@ -2,9 +2,9 @@ import connections
 from connections import Connection
 from downloadImages import downloadImages 
 from downloadImages import getLastImagePath
-import time
+import time, os
 import RPi.GPIO as GPIO
-import display
+#import display
 
 status = False
 pingAccuracy = 4
@@ -13,8 +13,8 @@ pingAccuracy = 4
 
 cons = []
 
-cons.append(Connection('http://master.local', ':8080/capture'))
-# cons.append(Connection('http://slave1.local', ':8080/capture'))
+#cons.append(Connection('http://master.local', ':8080/capture'))
+cons.append(Connection('http://slave1.local', ':8080/capture'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
@@ -38,36 +38,43 @@ def connectAndDownload():
 pwmPin = 18 # Broadcom pin 18 (P1 pin 12)
 ledPin = 27# Broadcom pin 23 (P1 pin 16)
 butPin = 17 # Broadcom pin 17 (P1 pin 11)
+shutterPin = 4
 
 dc = 95 # duty cycle (0-100) for PWM pin
 
 # Pin Setup:
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 GPIO.setup(ledPin, GPIO.OUT) # LED pin set as output
+GPIO.setup(shutterPin, GPIO.OUT) # LED pin set as output
 GPIO.setup(pwmPin, GPIO.OUT) # PWM pin set as output
 pwm = GPIO.PWM(pwmPin, 50)  # Initialize PWM on pwmPin 100Hz frequency
 GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
 
 # Initial state for LEDs:
-GPIO.output(ledPin, GPIO.LOW)
+GPIO.output(ledPin, GPIO.HIGH)
+GPIO.output(shutterPin, GPIO.LOW)
 pwm.start(dc)
 
 
-
+print('eskitit')
 print("Here we go! Press CTRL+C to exit")
 try:
 	while 1:
-		if GPIO.input(butPin): # button is released
+		if  (GPIO.input(butPin)): # button is released
 			pwm.ChangeDutyCycle(dc)
-			GPIO.output(ledPin, GPIO.LOW)
+#			GPIO.output(ledPin, GPIO.HIGH)
 		else: # button is pressed:
-			pwm.ChangeDutyCycle(100-dc)
-			GPIO.output(ledPin, GPIO.HIGH)
-			connectAndDownload()
-			GPIO.output(ledPin, GPIO.HIGH)
-			time.sleep(0.075)
+			print('button is pressed...')
 			GPIO.output(ledPin, GPIO.LOW)
-			display.displayImageOnDisplay(getLastImagePath())
+			GPIO.output(shutterPin, GPIO.HIGH)
+			pwm.ChangeDutyCycle(100-dc)
+			connectAndDownload()
+			time.sleep(0.075)
+			GPIO.output(shutterPin, GPIO.LOW)
+			GPIO.output(ledPin, GPIO.HIGH)
+			#os.system("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath())
+			#print("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath() +"/1.jpg")
+#			display.displayImageOnDisplay(getLastImagePath())
 except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 	pwm.stop() # stop PWM
 	GPIO.cleanup() # cleanup all GPIO

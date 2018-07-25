@@ -71,13 +71,13 @@ class Capture:
             try:
                 while imageCaptured == False:
                     if  (GPIO.input(shutterInput) == True): # button is released
+                        GPIO.output(readyPin, GPIO.LOW)  
                         print('button is released.')
                         camera.capture(stream, format='jpeg')
                         imageCaptured = True
-                        GPIO.output(readyPin, GPIO.LOW)
                         break
-                    else: # button is pressed:
-                        print('awaiting button release')
+#                    else: # button is pressed:
+#                        print('awaiting button release')
             except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
                 GPIO.cleanup() # cleanup all GPIO
                 pwm.stop() # stop PWM

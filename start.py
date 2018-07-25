@@ -13,7 +13,7 @@ pingAccuracy = 4
 
 cons = []
 
-#cons.append(Connection('http://master.local', ':8080/capture'))
+cons.append(Connection('http://master.local', ':8080/capture'))
 cons.append(Connection('http://slave1.local', ':8080/capture'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
@@ -66,11 +66,9 @@ try:
 		else: # button is pressed:
 			print('button is pressed...')
 			GPIO.output(ledPin, GPIO.LOW)
-			GPIO.output(shutterPin, GPIO.HIGH)
 			pwm.ChangeDutyCycle(100-dc)
 			connectAndDownload()
 			time.sleep(0.075)
-			GPIO.output(shutterPin, GPIO.LOW)
 			GPIO.output(ledPin, GPIO.HIGH)
 			#os.system("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath())
 			#print("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath() +"/1.jpg")

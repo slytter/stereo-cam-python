@@ -75,6 +75,9 @@ class Capture:
                         print('button is released.')
                         camera.capture(stream, format='jpeg')
                         imageCaptured = True
+                        GPIO.output(readyPin, GPIO.HIGH)
+                        time.sleep(0.05)
+                        GPIO.output(readyPin, GPIO.LOW)  
                         break
 #                    else: # button is pressed:
 #                        print('awaiting button release')

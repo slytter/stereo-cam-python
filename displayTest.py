@@ -7,19 +7,24 @@ pygame.init()
 # set up the window
 DISPLAYSURF = pygame.display.set_mode((480, 320))
 
-img1 = pygame.image.load(os.path.join('0.jpg'))
-img2 = pygame.image.load(os.path.join('1.jpg'))
+img1 = pygame.image.load(os.path.join('test.png'))
+img2 = pygame.image.load(os.path.join('mor.png'))
+DISPLAYSURF.blit(img1,(0,0), (0, 0, 480, 320))
+#pygame.image.save(DISPLAYSURF, 'test.png')
+#background = pygame.Surface(window)
 # rn the game loop
 incr = 0
 while True:
-	incr+=1
-	if(incr%2 == 0):
-		DISPLAYSURF.blit(img1,(0,0))
-	else:
-		DISPLAYSURF.blit(img2,(0,0))
+	incr+=7
+	pygame.transform.scale(DISPLAYSURF, (480,320))
+	DISPLAYSURF.blit(img1,(0,0), (0, 0, 480, 320))
 	
-	time.sleep(0.1)
-	pygame.draw.line(DISPLAYSURF, BLUE, (120, 60), (60, incr % 320))
+	time.sleep(1/30)
+	negativeIncr = 320 - (incr % 320)
+	pygame.draw.line(DISPLAYSURF, pygame.Color(255, 255, 255, 255), (480, negativeIncr), (0, incr % 320))
+	pygame.draw.line(DISPLAYSURF, pygame.Color(255, 0, 0, 255), (480, negativeIncr), (60, incr % 320 + 50))
+	pygame.draw.line(DISPLAYSURF, pygame.Color(0, 0, 255, 255), (480, negativeIncr), (0, incr % 320 + 100))
+	pygame.draw.line(DISPLAYSURF, pygame.Color(0, 255, 0, 255), (480, negativeIncr), (60, incr % 320 + 150))
 	
 	for event in pygame.event.get():
 			if event.type == QUIT:

@@ -4,7 +4,13 @@ from downloadImages import downloadImages
 from downloadImages import getLastImagePath
 import time, os
 import RPi.GPIO as GPIO
-#import display
+import pygame
+
+os.putenv('SDL_FBDEV', '/dev/fb1')
+pygame.init()
+
+DISPLAYSURF = pygame.display.set_mode((480, 320))
+
 
 status = False
 pingAccuracy = 4
@@ -13,7 +19,7 @@ pingAccuracy = 4
 
 cons = []
 
-cons.append(Connection('http://master.local', ':8080/capture'))
+#cons.append(Connection('http://master.local', ':8080/capture'))
 cons.append(Connection('http://slave1.local', ':8080/capture'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
@@ -25,12 +31,16 @@ status = connections.pingConnections(cons, pingAccuracy)
 def connectAndDownload():
 	started = time.time()
 	print('Starting requests')
-	if(downloadImages(cons, 10)):
+	frameBuffers = downloadImages(cons, 10)
+	if(len(frameBuffers) != 0):
+		print(len(frameBuffers))
 		print('Succesfully downloaded and compiled. It took: ' + str(time.time()-started) + ' secs')
+		return frameBuffers
 	else:
 		print('Download error. Re-pinging slaves')
 		global status
 		status = connections.pingConnections(cons, pingAccuracy)
+		return False
 
 
 
@@ -67,7 +77,14 @@ try:
 			print('button is pressed...')
 			GPIO.output(ledPin, GPIO.LOW)
 			pwm.ChangeDutyCycle(100-dc)
-			connectAndDownload()
+			frameBuffers = connectAndDownload()
+			#pygame.surfarray.make_surface(frameBuffers[0])
+			img1 = pygame.image.load(frameBuffers[0])
+			DISPLAYSURF.blit(img1,(0,0), (0, 0, 480, 320))
+			pygame.display.update()
+			GPIO.output(ledPin, GPIO.HIGH)
+			time.sleep(0.075)
+			GPIO.output(ledPin, GPIO.LOW)
 			time.sleep(0.075)
 			GPIO.output(ledPin, GPIO.HIGH)
 			#os.system("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath())

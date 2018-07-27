@@ -3,6 +3,7 @@ import datetime, time, os
 import grequests
 import time
 import RPi.GPIO as GPIO
+from io import BytesIO
 
 lastImagePath = ""
 
@@ -36,8 +37,8 @@ def downloadImages(cons, _fps) :
 			lastImagePath = name
 			paths.append(name)
 			with open(name, 'wb') as f:
-				frameCache.append(response.content)
-				f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
+				frameCache.append(BytesIO(response.content))
+				#f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
 		else:
 			return []
 		i += 1

@@ -53,8 +53,13 @@ def pingConnections(connections, accuracy):
 	return True
 
 def checkClientStatus(cons):
-	ips = map(lambda con: con.ip + con.port + '/status') # reversed pings instead of pings
+	ips = map(lambda con: con.ip + con.port + 'status', cons) # reversed pings instead of pings
 	requests = (grequests.get(ip, timeout = 10) for ip in ips)
 	responses = grequests.map(requests)
-	for response in responses:
-		print(response)
+	for i in range(0, len(cons)):
+		if(responses[i] != None and responses[i].status_code == 200):
+			cons[i].serverUp = True
+		else:
+			cons[i].serverUp = False
+		print(cons[i].serverUp)
+		print(cons[i].ip)

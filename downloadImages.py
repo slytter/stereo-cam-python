@@ -19,11 +19,11 @@ def downloadImages(cons, _fps) :
 	os.makedirs(basePath)
 
 	print('Requesting')
-	ips = map(lambda con: con.ip + con.port + '?delay=' + str(con.reversedPing), cons) # reversed pings instead of pings
+	ips = map(lambda con: con.ip + con.port + 'capture?delay=' + str(con.reversedPing), cons) # reversed pings instead of pings
 #	for ip in ips:   
 #		print(ip)
 
-	requests = (grequests.get(ip, timeout = 10) for ip in ips)
+	requests = (grequests.get(ip, timeout = 20) for ip in ips)
 	responses = grequests.map(requests)
 	for response in responses:
 		print(response)

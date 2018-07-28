@@ -5,15 +5,17 @@ from downloadImages import getLastImagePath
 import time, os
 import RPi.GPIO as GPIO
 import pygame
+from pygame.locals import USEREVENT
 import math
 
 os.putenv('SDL_FBDEV', '/dev/fb1')
 pygame.init()
-
 DISPLAYSURF = pygame.display.set_mode((480, 320))
 pygame.mouse.set_visible(False)
 font = pygame.font.Font("Futura.ttc", 20)
+small_font = pygame.font.Font("Futura.ttc", 15)
 text = font.render("loading", True, (255, 255, 255))
+cons = []
 
 
 img1 = pygame.image.load(os.path.join('slyt_logo.png')).convert_alpha()
@@ -40,20 +42,43 @@ loadingScreen()
 
 frontScreenText1 = font.render("shutter ready", True, (255, 255, 255))
 
+white = pygame.Color(255,255,255)
+black = pygame.Color(0,0,0)
 incrD = 0.0
+clock = pygame.time.Clock()
 def defaultScreen():
+	clock.tick()
+	print(clock.get_fps())
 	global incrD 
 	incrD += 1.0
-	DISPLAYSURF.fill(pygame.Color(0,0,0))
+	DISPLAYSURF.fill(black)
 	DISPLAYSURF.blit(frontScreenText1, (480/2 - frontScreenText1.get_width() // 2, 400/2 - frontScreenText1.get_height() // 2))
-	time.sleep(0.005)
-	col = int(abs(math.sin(incrD/10.0) * 100))
-	movement = int(abs(math.sin(incrD/10.0) * 50))
-	pygame.draw.line(DISPLAYSURF, pygame.Color(255,255,255), (480/2, 320/2 - 120 + movement), (480/2, 320/2 - 80 + movement))
-	pygame.draw.line(DISPLAYSURF, pygame.Color(255,255,255), (480/2, 320/2 - 80 + movement), (480/2 + 10, 320/2 - 90 + movement))
-	pygame.draw.line(DISPLAYSURF, pygame.Color(255,255,255), (480/2, 320/2 - 80 + movement), (480/2 - 10, 320/2 - 90 + movement))
+	#time.sleep(0.005)
+	col = int(abs(math.sin(incrD/100.0) * 100))
+	movement = int(abs(math.sin(incrD/50.0) * 50))
+	pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 120 + movement), (480/2, 320/2 - 80 + movement))
+	pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 80 + movement), (480/2 + 10, 320/2 - 90 + movement))
+	pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 80 + movement), (480/2 - 10, 320/2 - 90 + movement))
 	pygame.draw.ellipse(DISPLAYSURF, pygame.Color(col,col,col, col), (480/2 - 35, 400/2 - 64, 70, 23))
-	pygame.draw.ellipse(DISPLAYSURF, pygame.Color(0,0,0), (480/2 - 30, 400/2 - 65, 60, 20))
+	pygame.draw.ellipse(DISPLAYSURF, black, (480/2 - 30, 400/2 - 65, 60, 20))
+	ok = True
+	for i in range(0,len(cons)):
+		ind_col = white
+		if(cons[i].ping > 20):
+			ind_col = pygame.Color(255,50,50)
+		pygame.draw.ellipse(DISPLAYSURF, ind_col, (10 + 30 * i, 10, 20, 20))
+		if (cons[i].status == False or cons[i].serverUp == False):
+			ok = False
+			pygame.draw.ellipse(DISPLAYSURF, pygame.Color(0,0,0), (12 + 30 * i, 12, 16, 16))
+	if(ok == True):
+		okmsg = small_font.render("ok", True, (255, 255, 255))
+	else:
+		okmsg = small_font.render("connection error", True, (255, 255, 255))
+
+	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 10))
+
+		
+	
 	pygame.display.update()
 
 status = False
@@ -61,12 +86,11 @@ pingAccuracy = 4
 # realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
 # realIps = ['slave1.local', 'master.local']
 
-cons = []
 
 cons.append(Connection('http://master.local', ':8080/capture'))
 cons.append(Connection('http://slave1.local', ':8080/capture'))
-#cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
-#cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
+cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
+cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
 status = connections.pingConnections(cons, pingAccuracy)
 loadingScreen()
@@ -112,38 +136,39 @@ GPIO.output(shutterPin, GPIO.LOW)
 pwm.start(dc)
 loadingScreen()
 
-
-print('eskitit')
-print("Here we go! Press CTRL+C to exit")
+zigzag = [0, 1, 2, 3, 2, 1] # 4 image zig zag
 images = []
 count = 0
 frameShowAmount = 20
 framesToShow = frameShowAmount
+pygame.time.set_timer(USEREVENT+1, 40)
+
 try:
 	while 1:
 		if  (GPIO.input(butPin)): # button is released
-			pwm.ChangeDutyCycle(dc)
+			#pwm.ChangeDutyCycle(dc)
 			if(len(images) > 0):
+				image = images[zigzag[count % 6]]
 				count+=1
-				print(len(images))
-				image = images[count % 2]
+				print(zigzag[count % 6])
 				DISPLAYSURF.set_colorkey(image.get_colorkey())
 				DISPLAYSURF.blit(image,(80,0), (0, 0, 480, 320))
 				pygame.display.update()
-				time.sleep(0.15)
+				time.sleep(0.10)
 				framesToShow -= 1
 				if(framesToShow < 0):
 					framesToShow = frameShowAmount
 					images = []
 			else:
-				defaultScreen()
+				for event in pygame.event.get():
+					if event.type == USEREVENT+1:
+						defaultScreen()
 
-#			GPIO.output(ledPin, GPIO.HIGH)
 		else: # button is pressed:
 			framesToShow = frameShowAmount
 			print('button is pressed...')
 			GPIO.output(ledPin, GPIO.LOW)
-			pwm.ChangeDutyCycle(100-dc)
+			#pwm.ChangeDutyCycle(100-dc)
 			frameBuffers = connectAndDownload()
 			images = []
 			for i in range(0, len(frameBuffers)):
@@ -151,17 +176,11 @@ try:
 				image = pygame.transform.smoothscale(image, (320, 320))
 				images.append(image)
 				
-				
-			#pygame.surfarray.make_surface(frameBuffers[0])
-			#DISPLAYSURF.blit(img1,(0,0), (0, 0, 480, 320))
 			GPIO.output(ledPin, GPIO.HIGH)
 			time.sleep(0.075)
 			GPIO.output(ledPin, GPIO.LOW)
 			time.sleep(0.075)
 			GPIO.output(ledPin, GPIO.HIGH)
-			#os.system("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath())
-			#print("sudo fbi -noverbose -T 1 -a -d /dev/fb1 " + getLastImagePath() +"/1.jpg")
-#			display.displayImageOnDisplay(getLastImagePath())
 except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 	pwm.stop() # stop PWM
 	GPIO.cleanup() # cleanup all GPIO

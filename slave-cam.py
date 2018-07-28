@@ -11,13 +11,12 @@ GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 #pwm = GPIO.PWM(pwmPin, 100)  # Initialize PWM on pwmPin 100Hz frequency
 GPIO.setup(shutterInput, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
 GPIO.setup(readyPin, GPIO.OUT) # LED pin set as output
-GPIO.output(readyPin, GPIO.LOW)
-
-
-
+GPIO.output(readyPin, GPIO.HIGH)
+ok = False
 
 urls = (
-    '/capture', 'Capture'
+    '/capture', 'Capture',
+    '/status', 'Status'
 )
 
 # start with default values for resolution
@@ -25,9 +24,19 @@ width = 1024
 height = 1024
 
 if __name__ == "__main__":
-
     app = web.application(urls, globals())
+    GPIO.output(readyPin, GPIO.HIGH)
+    time.sleep(0.15)
+    GPIO.output(readyPin, GPIO.LOW)
     app.run()
+
+ok = True
+class Status:
+    def GET(self):
+        web.header('Content-Type', 'text/html')
+        return str(ok)
+
+
 
 class Capture:
     def GET(self):

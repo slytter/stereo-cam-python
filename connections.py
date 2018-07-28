@@ -2,6 +2,7 @@ import os, platform, time
 import shlex  
 from latencyTester import averagePing
 from subprocess import Popen, PIPE, STDOUT
+import grequests
 
 class Connection : # place this in another doc please..
 	ip = ''
@@ -9,7 +10,7 @@ class Connection : # place this in another doc please..
 	ping = 0
 	status = False
 	reversedPing = 0
-	
+	serverUp = False
 	def __init__ (self, _ip, _port):
 		self.ip = _ip
 		self.port = _port
@@ -50,3 +51,10 @@ def pingConnections(connections, accuracy):
 				
 			return True
 	return True
+
+def checkClientStatus(cons):
+	ips = map(lambda con: con.ip + con.port + '/status') # reversed pings instead of pings
+	requests = (grequests.get(ip, timeout = 10) for ip in ips)
+	responses = grequests.map(requests)
+	for response in responses:
+		print(response)

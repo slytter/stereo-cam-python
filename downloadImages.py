@@ -3,6 +3,7 @@ import datetime, time, os
 import grequests
 import time
 import RPi.GPIO as GPIO
+from io import BytesIO
 
 lastImagePath = ""
 
@@ -27,6 +28,7 @@ def downloadImages(cons, _fps) :
 	for response in responses:
 		print(response)
 	i = 0 
+	frameCache = []
 	starting = time.time()
 	for response in responses:
 		if 199 < response.status_code < 400:
@@ -35,14 +37,15 @@ def downloadImages(cons, _fps) :
 			lastImagePath = name
 			paths.append(name)
 			with open(name, 'wb') as f:
-				f.write(response.content)
+				frameCache.append(BytesIO(response.content))
+				#f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
 		else:
-			return False
+			return []
 		i += 1
 	print('It took ' + str(time.time()-startTime) + 'to download images')
 	GPIO.output(27, GPIO.LOW)
 	images = []
-	for filename in paths:
-		images.append(imageio.imread(filename))
-	imageio.mimsave(basePath + '/compiled.gif', images, fps=_fps)
-	return True
+	#for filename in paths:
+	#images.append(imageio.imread(filename))
+	#imageio.mimsave(basePath + '/compiled.gif', images, fps=_fps)
+	return frameCache

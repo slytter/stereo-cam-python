@@ -3,6 +3,7 @@ import shlex
 from latencyTester import averagePing
 from subprocess import Popen, PIPE, STDOUT
 import grequests
+import asyncio
 
 class Connection : # place this in another doc please..
 	ip = ''
@@ -52,7 +53,7 @@ def pingConnections(connections, accuracy):
 			return True
 	return True
 
-def checkClientStatus(cons):
+async def checkClientStatus(cons):
 	ips = map(lambda con: con.ip + con.port + 'status', cons) # reversed pings instead of pings
 	requests = (grequests.get(ip, timeout = 10) for ip in ips)
 	responses = grequests.map(requests)

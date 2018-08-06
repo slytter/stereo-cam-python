@@ -7,6 +7,8 @@ import RPi.GPIO as GPIO
 import pygame
 from pygame.locals import USEREVENT
 import math
+import asyncio
+from runcoroutine import runCoroutine
 
 os.putenv('SDL_FBDEV', '/dev/fb1')
 pygame.init()
@@ -54,8 +56,9 @@ def defaultScreen():
 
 	ok = True
 	if(int(incrD) % checkConnectionEveryXFrame == 0):
-		connections.checkClientStatus(cons) # can this be done in a coroutine?
-
+		print('before corou')
+		runCoroutine(connections.checkClientStatus(cons)) # can this be done in a coroutine?
+		print('after corou')
 	for i in range(0,len(cons)):
 		ind_col = white
 		if(cons[i].ping > 30):
@@ -85,10 +88,8 @@ def defaultScreen():
 	else: 
 		DISPLAYSURF.blit(frontScreenText2, (480/2 - frontScreenText2.get_width() // 2, 400/2 - frontScreenText2.get_height() // 2))
 
-	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 10))
+	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 9))
 
-		
-	
 	pygame.display.update()
 
 status = False
@@ -99,14 +100,15 @@ pingAccuracy = 4
 
 cons.append(Connection('http://master.local', ':8080/'))
 cons.append(Connection('http://slave1.local', ':8080/'))
+cons.append(Connection('http://slave2.local', ':8080/'))
+cons.append(Connection('http://slave3.local', ':8080/'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
 status = connections.pingConnections(cons, pingAccuracy)
 loadingScreen()
 
-connections.checkClientStatus(cons)
-
+runCoroutine(connections.checkClientStatus(cons))
 
 def connectAndDownload():
 	started = time.time()

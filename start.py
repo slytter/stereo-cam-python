@@ -41,6 +41,7 @@ loadingScreen()
 
 
 frontScreenText1 = font.render("shutter ready", True, (255, 255, 255))
+frontScreenText2 = small_font.render("release shutter when all shutter-indicators are synced", True, (255, 255, 255))
 
 checkConnectionEveryXFrame = 100
 white = pygame.Color(255,255,255)
@@ -50,18 +51,7 @@ clock = pygame.time.Clock()
 def defaultScreen():
 	clock.tick()
 	# print(clock.get_fps())
-	global incrD 
-	incrD += 1.0
-	DISPLAYSURF.fill(black)
-	DISPLAYSURF.blit(frontScreenText1, (480/2 - frontScreenText1.get_width() // 2, 400/2 - frontScreenText1.get_height() // 2))
-	#time.sleep(0.005)
-	col = int(abs(math.sin(incrD/100.0) * 100))
-	movement = int(abs(math.sin(incrD/50.0) * 50))
-	pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 120 + movement), (480/2, 320/2 - 80 + movement))
-	pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 80 + movement), (480/2 + 10, 320/2 - 90 + movement))
-	pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 80 + movement), (480/2 - 10, 320/2 - 90 + movement))
-	pygame.draw.ellipse(DISPLAYSURF, pygame.Color(col,col,col, col), (480/2 - 35, 400/2 - 64, 70, 23))
-	pygame.draw.ellipse(DISPLAYSURF, black, (480/2 - 30, 400/2 - 65, 60, 20))
+
 	ok = True
 	if(int(incrD) % checkConnectionEveryXFrame == 0):
 		connections.checkClientStatus(cons) # can this be done in a coroutine?
@@ -78,6 +68,22 @@ def defaultScreen():
 		okmsg = small_font.render("ok", True, (255, 255, 255))
 	else:
 		okmsg = small_font.render("connection error", True, (255, 255, 255))
+
+	if(ok == True):
+		global incrD 
+		incrD += 1.0
+		DISPLAYSURF.fill(black)
+		DISPLAYSURF.blit(frontScreenText1, (480/2 - frontScreenText1.get_width() // 2, 400/2 - frontScreenText1.get_height() // 2))
+		#time.sleep(0.005)
+		col = int(abs(math.sin(incrD/100.0) * 100))
+		movement = int(abs(math.sin(incrD/50.0) * 50))
+		pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 120 + movement), (480/2, 320/2 - 80 + movement))
+		pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 80 + movement), (480/2 + 10, 320/2 - 90 + movement))
+		pygame.draw.line(DISPLAYSURF, white, (480/2, 320/2 - 80 + movement), (480/2 - 10, 320/2 - 90 + movement))
+		pygame.draw.ellipse(DISPLAYSURF, pygame.Color(col,col,col, col), (480/2 - 35, 400/2 - 64, 70, 23))
+		pygame.draw.ellipse(DISPLAYSURF, black, (480/2 - 30, 400/2 - 65, 60, 20))
+	else: 
+		DISPLAYSURF.blit(frontScreenText2, (480/2 - frontScreenText2.get_width() // 2, 400/2 - frontScreenText2.get_height() // 2))
 
 	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 10))
 

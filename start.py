@@ -42,13 +42,14 @@ loadingScreen()
 
 frontScreenText1 = font.render("shutter ready", True, (255, 255, 255))
 
+checkConnectionEveryXFrame = 100
 white = pygame.Color(255,255,255)
 black = pygame.Color(0,0,0)
 incrD = 0.0
 clock = pygame.time.Clock()
 def defaultScreen():
 	clock.tick()
-	print(clock.get_fps())
+	# print(clock.get_fps())
 	global incrD 
 	incrD += 1.0
 	DISPLAYSURF.fill(black)
@@ -62,9 +63,12 @@ def defaultScreen():
 	pygame.draw.ellipse(DISPLAYSURF, pygame.Color(col,col,col, col), (480/2 - 35, 400/2 - 64, 70, 23))
 	pygame.draw.ellipse(DISPLAYSURF, black, (480/2 - 30, 400/2 - 65, 60, 20))
 	ok = True
+	if(int(incrD) % checkConnectionEveryXFrame == 0):
+		connections.checkClientStatus(cons) # can this be done in a coroutine?
+
 	for i in range(0,len(cons)):
 		ind_col = white
-		if(cons[i].ping > 20):
+		if(cons[i].ping > 30):
 			ind_col = pygame.Color(255,50,50)
 		pygame.draw.ellipse(DISPLAYSURF, ind_col, (10 + 30 * i, 10, 20, 20))
 		if (cons[i].status == False or cons[i].serverUp == False):
@@ -87,14 +91,15 @@ pingAccuracy = 4
 # realIps = ['slave1.local', 'master.local']
 
 
-cons.append(Connection('http://master.local', ':8080/capture'))
-cons.append(Connection('http://slave1.local', ':8080/capture'))
-cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
-cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
+cons.append(Connection('http://master.local', ':8080/'))
+cons.append(Connection('http://slave1.local', ':8080/'))
+#cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
+#cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
 status = connections.pingConnections(cons, pingAccuracy)
 loadingScreen()
 
+connections.checkClientStatus(cons)
 
 
 def connectAndDownload():
@@ -148,7 +153,7 @@ try:
 		if  (GPIO.input(butPin)): # button is released
 			#pwm.ChangeDutyCycle(dc)
 			if(len(images) > 0):
-				image = images[zigzag[count % 6]]
+				image = images[zigzag[count % 6] % len(images)]
 				count+=1
 				print(zigzag[count % 6])
 				DISPLAYSURF.set_colorkey(image.get_colorkey())

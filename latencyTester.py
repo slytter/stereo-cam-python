@@ -7,10 +7,10 @@ def averagePing(ping_destination, amount) :
 	ping_destination = ping_destination.replace("http://","") # removing http:// from the string since its not supported in ping
 	count = 0
 	line = 'Ping Interval: ' + str(interval) + ', Destination: ' + ping_destination + ', Threshold to Log (msec): ' + str(threshold) + '\n'
-	ping_command = 'ping -i ' + str(interval) + ' ' + ping_destination
+	ping_command = 'ping ' + ping_destination + ' -t 1'
 
 	child = pexpect.spawn(ping_command)
-	child.timeout=1200
+	child.timeout=400
 
 	pings = []
  
@@ -20,6 +20,10 @@ def averagePing(ping_destination, amount) :
 			return False
 
 		if line.startswith(b'ping: unknown host'):
+			print('Unknown host: ' + ping_destination)
+			return False
+
+		if line.startswith(b'Alarm clock:'):
 			print('Unknown host: ' + ping_destination)
 			return False
 

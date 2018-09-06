@@ -15,7 +15,7 @@ read -p "Restart this Pi?" -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo "Restarting"
-	sudo shutdown -r 0
+	sudo reboot now
 else
 	echo "Not restarting"
 fi

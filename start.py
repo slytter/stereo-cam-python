@@ -1,24 +1,26 @@
+import GUI
+GUI.loadingScreen()
 import connections
 from connections import Connection
-from downloadImages import downloadImages 
-from downloadImages import getLastImagePath
-import time, os
+from downloadImages import downloadImages, getLastImagePath
+import time
 import RPi.GPIO as GPIO
 import pygame
+from asyncioTest import runIt
 from pygame.locals import USEREVENT
-import math
-import asyncio
+#import asyncio
 from runcoroutine import runCoroutine
-import GUI
-cons = []
+import asyncio 
+from asyncio import * 
 
-
+runIt()
 status = False
-pingAccuracy = 4
+pingAccuracy = 2
 # realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
 # realIps = ['slave1.local', 'master.local']
 
 
+cons = []
 cons.append(Connection('http://master.local', ':8080/'))
 cons.append(Connection('http://slave1.local', ':8080/'))
 cons.append(Connection('http://slave2.local', ':8080/'))
@@ -26,8 +28,9 @@ cons.append(Connection('http://slave3.local', ':8080/'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
-status = connections.pingConnections(cons, pingAccuracy)
-GUI.loadingScreen()
+status = connections.pingConnections(cons, 1)
+
+GUI.loadingScreen('connected')
 
 runCoroutine(connections.checkClientStatus(cons))
 
@@ -55,17 +58,16 @@ GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 GPIO.setup(ledPin, GPIO.OUT) # LED pin set as output
 GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
 GUI.loadingScreen()
-
-# Initial state for LEDs:
 GPIO.output(ledPin, GPIO.HIGH)
 GUI.loadingScreen()
 
+targetFps = 30
 zigzag = [0, 1, 2, 3, 2, 1] # 4 image zig zag
 images = []
 count = 0
-frameShowAmount = 200
+frameShowAmount = 50
 framesToShow = frameShowAmount
-pygame.time.set_timer(USEREVENT+1, 40)
+pygame.time.set_timer(USEREVENT+1, int(1000/targetFps))
 
 try:
 	while 1:
@@ -81,7 +83,7 @@ try:
 				if(framesToShow < 0):
 					framesToShow = frameShowAmount
 					images = []
-			else:
+			else: #
 				for event in pygame.event.get():
 					if event.type == USEREVENT+1:
 						GUI.defaultScreen(cons)

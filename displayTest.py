@@ -1,7 +1,8 @@
 import pygame, sys, os
 from pygame.locals import *
 import time
-os.putenv('SDL_FBDEV', '/dev/fb1')
+#cos.putenv('SDL_FBDEV', '/dev/fb0')
+os.environ["SDL_FBDEV"] = "/dev/fb0"
 pygame.init()
 
 # set up the window

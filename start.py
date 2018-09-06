@@ -6,19 +6,11 @@ from downloadImages import downloadImages, getLastImagePath
 import time
 import RPi.GPIO as GPIO
 import pygame
-from asyncioTest import runIt
 from pygame.locals import USEREVENT
-#import asyncio
-from runcoroutine import runCoroutine
-import asyncio 
-from asyncio import * 
+import threading
 
-runIt()
 status = False
 pingAccuracy = 2
-# realIps = ['http://localhost:3000', 'http://192.168.0.34:3000']
-# realIps = ['slave1.local', 'master.local']
-
 
 cons = []
 cons.append(Connection('http://master.local', ':8080/'))
@@ -26,13 +18,14 @@ cons.append(Connection('http://slave1.local', ':8080/'))
 cons.append(Connection('http://slave2.local', ':8080/'))
 cons.append(Connection('http://slave3.local', ':8080/'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
-#cons.append(Connection('http://slytter.tk', '/photos/project-images/lux.jpg'))
 
-status = connections.pingConnections(cons, 1)
+# run connection coroutine here.
+
 
 GUI.loadingScreen('connected')
 
-runCoroutine(connections.checkClientStatus(cons))
+threading.Thread(target=connections.updateConnections, args=[cons, 3]).start()
+
 
 def connectAndDownload():
 	started = time.time()

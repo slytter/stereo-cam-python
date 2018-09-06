@@ -1,5 +1,5 @@
 import os, pygame, time, math
-from runcoroutine import runCoroutine
+# from runcoroutine import runCoroutine
 import connections
 
 os.putenv('SDL_FBDEV', '/dev/fb0')
@@ -48,8 +48,8 @@ def defaultScreen(cons):
 	clock.tick()
 	global incrD 
 	incrD += 1.0
-	if(int(incrD) % checkConnectionEveryXFrame == 0):
-		runCoroutine(connections.checkClientStatus(cons)) # can this be done in a coroutine?
+	# if(int(incrD) % checkConnectionEveryXFrame == 0):
+	# 	runCoroutine(connections.checkClientStatus(cons)) # can this be done in a coroutine?
 	
 	ok = renderConnectionDots(cons)
 
@@ -65,9 +65,10 @@ def defaultScreen(cons):
 
 
 def displayImage(image):
-    DISPLAYSURF.set_colorkey(image.get_colorkey())
-    DISPLAYSURF.blit(image,(80,0), (0, 0, 480, 320))
-    pygame.display.update()
+	DISPLAYSURF.fill(white)
+	#   DISPLAYSURF.set_colorkey(image.get_colorkey())
+	DISPLAYSURF.blit(image,(80,0), (0, 0, 480, 320))
+	pygame.display.update()
 
 
 def drawAnimation(ready, incr):

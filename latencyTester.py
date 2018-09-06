@@ -1,4 +1,11 @@
-import os, sys, pexpect, time, datetime
+import os, sys, time, datetime
+import socket
+
+
+def online(ping_destination):
+	ping_destination = ping_destination.replace("http://","")
+	HOST_UP = True if os.system("timeout 1 ping -c 1 -W 1 " + ping_destination) is 0 else False
+	return HOST_UP
 
 def averagePing(ping_destination, amount) :
 	# SET YOUR PING RESPONSE TIME THRESHOLD HERE, IN MILLISECONDS
@@ -9,7 +16,7 @@ def averagePing(ping_destination, amount) :
 	line = 'Ping Interval: ' + str(interval) + ', Destination: ' + ping_destination + ', Threshold to Log (msec): ' + str(threshold) + '\n'
 	ping_command = 'ping ' + ping_destination + ' -t 1'
 
-	child = pexpect.spawn(ping_command)
+	# child = pexpect.spawn(ping_command)
 	child.timeout=400
 
 	pings = []

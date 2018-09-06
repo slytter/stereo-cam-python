@@ -1,13 +1,13 @@
 import os, platform, time
 import shlex  
-from latencyTester import averagePing
+from latencyTester import averagePing, online
 from subprocess import Popen, PIPE, STDOUT
 import grequests
 import asyncio
 import GUI
-from runcoroutine import runCoroutine
+# from runcoroutine import runCoroutine
 
-bool _mayCheckConnections = True
+_mayCheckConnections = True
 def enableConnectionCheck(enable):
 	mayCheckConnections = enable
 def mayCheckConnection():
@@ -25,7 +25,8 @@ class Connection : # place this in another doc please..
 		self.port = _port
 	
 	def updateConnection(self, accuracy):
-		con = averagePing(self.ip, accuracy)
+		con = online(self.ip)
+		print(self.ip)
 		if(con != False) : # returning false if connection down, and the ping if up
 			self.ping = con
 			self.status = True
@@ -53,11 +54,10 @@ def pingConnections(cons, accuracy, loop = True):
 		
 		if(anyConnectionDown > 0):
 			GUI.loadingScreen(str(anyConnectionDown) + ' connection' + ('' if(anyConnectionDown == 1) else 's') + ' down')
-			#checkClientStatus(cons)
 			GUI.renderConnectionDots(cons)
 			GUI.pygame.display.update()
 			if(loop == False):
-				pingConnections = 0 #thus breaking the while loop
+				anyConnectionDown = 0 #thus breaking the while loop
 			else:
 				print(str(anyConnectionDown) + ' connection down. Re-pinging in 1 second')
 				time.sleep(1)
@@ -70,7 +70,7 @@ def pingConnections(cons, accuracy, loop = True):
 
 
 
-async def checkClientStatus(cons):
+def checkClientStatus(cons):
 	ips = map(lambda con: con.ip + con.port + 'status', cons) # reversed pings instead of pings
 	requests = (grequests.get(ip, timeout = 0.5) for ip in ips)
 	responses = grequests.map(requests)
@@ -79,8 +79,17 @@ async def checkClientStatus(cons):
 			cons[i].serverUp = True
 		else:
 			cons[i].serverUp = False
-#		print(cons[i].serverUp)
-#		print(cons[i].ip)
 
 
-
+def updateConnections(cons, eachSeconds):
+	try:
+		while 1: # Constantly check
+			if(mayCheckConnection()): # if permitted
+				pingConnections(cons, 1, False) # that the pi's can be seen on the network.
+				checkClientStatus(cons) # and that the slave servers are up and returning 200
+				time.sleep(eachSeconds) # then wait for a while
+			else: # if not permitted
+				time.sleep(1) # check again in 1 sec.
+	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
+		GPIO.cleanup() # cleanup all GPIO
+		

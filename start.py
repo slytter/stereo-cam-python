@@ -21,11 +21,7 @@ cons.append(Connection('http://slave3.local', ':8080/'))
 
 # run connection coroutine here.
 
-
-GUI.loadingScreen('connected')
-
 threading.Thread(target=connections.updateConnections, args=[cons, 3]).start()
-
 
 def connectAndDownload():
 	started = time.time()

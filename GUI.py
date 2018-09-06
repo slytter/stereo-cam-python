@@ -1,11 +1,9 @@
 import os, pygame, time, math
 # from runcoroutine import runCoroutine
-import connections
 
 os.putenv('SDL_FBDEV', '/dev/fb0')
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((480, 320))
-
 
 ### TEXT RENDERS ###
 pygame.mouse.set_visible(False)
@@ -31,7 +29,13 @@ half = [480/2, 320/2]
 def modColor(val):
 	return val % 255
 
-def loadingScreen(msg = 'loading'):
+def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
+
+	if(anyConnectionDown > 0):
+		GUI.loadingScreen(str(anyConnectionDown) + ' connection' + ('' if(anyConnectionDown == 1) else 's') + ' down')
+		GUI.renderConnectionDots(cons)
+		GUI.pygame.display.update()
+
 	global incr
 	incr+=15
 	text = font.render(msg, True, (255, 255, 255))

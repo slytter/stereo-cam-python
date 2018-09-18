@@ -2,11 +2,11 @@
 read -p "Change to ad-hoc (or back to wifi) ? " -n 1 -r 
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	echo "Changing to ad-hoc"
+	printf "\n - Changing to ad-hoc \n"
 	sudo bash -c "cat interface_configs/ad-hoc > /etc/network/interfaces"
 	sudo ifup wlan0
 else
-	echo"Changing to normal wifi"
+	printf "\n - Changing to normal wifi \n"
 	sudo bash -c "cat interface_configs/wifi > /etc/network/interfaces"
 fi
 
@@ -14,9 +14,9 @@ fi
 read -p "Restart this Pi?" -n 1 -r 
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	echo "Restarting"
+	printf "\n - Restarting \n"
 	sudo reboot now
 else
-	echo "Not restarting"
+	printf "\n - Not restarting \n"
 fi
 

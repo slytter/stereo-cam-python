@@ -3,6 +3,8 @@ import io
 import time
 import picamera
 import RPi.GPIO as GPIO
+import webGallery
+from webGallery import Gallery, GetImage
 
 readyPin = 15
 shutterInput = 14
@@ -14,7 +16,9 @@ ok = False
 
 urls = (
     '/capture', 'Capture',
-    '/status', 'Status'
+    '/status', 'Status',
+    '/gallery', 'Gallery',
+    '/get-image', 'GetImage'
 )
 
 # start with default values for resolution

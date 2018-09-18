@@ -16,7 +16,7 @@ cons = []
 cons.append(Connection('http://master.local', ':8080/'))
 cons.append(Connection('http://slave1.local', ':8080/'))
 cons.append(Connection('http://slave2.local', ':8080/'))
-cons.append(Connection('http://slave3.local', ':8080/'))
+# cons.append(Connection('http://slave3.local', ':8080/'))
 #cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 
 # run connection coroutine here.
@@ -87,7 +87,6 @@ try:
 				image = pygame.image.load(frameBuffers[i]).convert_alpha()
 				image = pygame.transform.smoothscale(image, (320, 320))
 				images.append(image)
-				
 			GPIO.output(ledPin, GPIO.HIGH)
 			time.sleep(0.075)
 			GPIO.output(ledPin, GPIO.LOW)

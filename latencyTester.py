@@ -4,7 +4,7 @@ import socket
 
 def online(ping_destination):
 	ping_destination = ping_destination.replace("http://","")
-	HOST_UP = True if os.system("timeout 1 ping -c 1 -W 1 " + ping_destination) is 0 else False
+	HOST_UP = True if os.system("timeout 5 ping -c 1 -W 5 " + ping_destination) is 0 else False
 	return HOST_UP
 
 def averagePing(ping_destination, amount) :

@@ -44,7 +44,6 @@ def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
 	DISPLAYSURF.blit(img1,(480/2 - w/2, 320/2 - h/2), (0, 0, 480, 320))
 	DISPLAYSURF.blit(text, (480/2 - text.get_width() // 2, 320/2 - text.get_height() // 2 + 50))
 	# pygame.draw.rect(DISPLAYSURF, pygame.Color(255,255,255), (0, 0, 480, 320))
-	time.sleep(0.005)
 	pygame.display.update()
 
 def defaultScreen(cons):
@@ -104,3 +103,8 @@ def renderConnectionDots(cons):
 			ok = False
 			pygame.draw.ellipse(DISPLAYSURF, pygame.Color(0,0,0), (12 + 30 * i, 12, 16, 16))
 	return ok
+
+def message(message):
+	text = font.render(message, True, (255, 255, 255))
+	DISPLAYSURF.blit(text, (480/2 - text.get_width() // 2, 320/2 - text.get_height() // 2 + 50))
+	pygame.display.update()

@@ -2,95 +2,91 @@ import GUI
 GUI.loadingScreen()
 import connections
 from connections import Connection
-from downloadImages import downloadImages, getLastImagePath
+from downloadImages import connectAndDownload
 import time
 import RPi.GPIO as GPIO
 import pygame
 from pygame.locals import USEREVENT
 import threading
+import sequenceGen
 
 status = False
 pingAccuracy = 2
 
 cons = []
 cons.append(Connection('http://master.local', ':8080/'))
-cons.append(Connection('http://slave1.local', ':8080/'))
-cons.append(Connection('http://slave2.local', ':8080/'))
+# cons.append(Connection('http://slave1.local', ':8080/'))
+# cons.append(Connection('http://slave2.local', ':8080/'))
 # cons.append(Connection('http://slave3.local', ':8080/'))
-#cons.append(Connection('http://slytter.tk', '/photos/project-images/embodied.jpg'))
 
-# run connection coroutine here.
-
-threading.Thread(target=connections.updateConnections, args=[cons, 3]).start()
-
-def connectAndDownload():
-	started = time.time()
-	print('Starting requests')
-	frameBuffers = downloadImages(cons, 10)
-	if(len(frameBuffers) != 0):
-		print(len(frameBuffers))
-		print('Succesfully downloaded and compiled. It took: ' + str(time.time()-started) + ' secs')
-		return frameBuffers
-	else:
-		print('Download error. Re-pinging slaves')
-		global status
-		status = connections.pingConnections(cons, pingAccuracy)
-		return False
-
-
+threading.Thread(target=connections.updateConnections, args=[cons, 5]).start() # Update connections in other thread.
 
 # Pin Definitons:
 ledPin = 27# Broadcom pin 23 (P1 pin 16)
 butPin = 17 # Broadcom pin 17 (P1 pin 11)
+shutDownPin = 3 # Broadcom pin 17 (P1 pin 11)
+
 # Pin Setup:
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 GPIO.setup(ledPin, GPIO.OUT) # LED pin set as output
 GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
-GUI.loadingScreen()
+GPIO.setup(shutDownPin, GPIO.IN) # Button pin set as input w/ pull-up
 GPIO.output(ledPin, GPIO.HIGH)
+GPIO.setwarnings(False)
+
 GUI.loadingScreen()
 
 targetFps = 30
-zigzag = [0, 1, 2, 3, 2, 1] # 4 image zig zag
-images = []
-count = 0
-frameShowAmount = 50
-framesToShow = frameShowAmount
+zigzag = sequenceGen.zigZag(len(cons))
+pygameImages = []
 pygame.time.set_timer(USEREVENT+1, int(1000/targetFps))
 
-try:
-	while 1:
-		if  (GPIO.input(butPin)): # button is released
-			#pwm.ChangeDutyCycle(dc)
-			if(len(images) > 0):
-				image = images[zigzag[count % 6] % len(images)]
-				count+=1
-				print(zigzag[count % 6])
-				GUI.displayImage(image)
-				time.sleep(0.10)
-				framesToShow -= 1
-				if(framesToShow < 0):
-					framesToShow = frameShowAmount
-					images = []
-			else: #
-				for event in pygame.event.get():
-					if event.type == USEREVENT+1:
-						GUI.defaultScreen(cons)
+def mainLoop(pygameImages):
+	try:
+		while 1:
+			if (GPIO.input(butPin) == GPIO.HIGH): # button is released
+				if(GPIO.input(shutDownPin) == GPIO.LOW):
+					connections.shutDownPis(cons)
+				time.sleep(0.016) # sleep for ~ delta 60 fps
+				if(len(pygameImages) > 0): # if any images in buffer,
+					pygameImages = showLastImage(pygameImages) # show them and remove them
+				else: #
+					for event in pygame.event.get():
+						if event.type == USEREVENT+1:
+							GUI.defaultScreen(cons)
+			else: # button is pressed:
+				print('Shutter pressed')
+				connections.enableConnectionCheck(False)
+				pygameImages = captureImage()
+				connections.enableConnectionCheck(True)
 
-		else: # button is pressed:
-			framesToShow = frameShowAmount
-			print('button is pressed...')
-			GPIO.output(ledPin, GPIO.LOW)
-			frameBuffers = connectAndDownload()
-			images = []
-			for i in range(0, len(frameBuffers)):
-				image = pygame.image.load(frameBuffers[i]).convert_alpha()
-				image = pygame.transform.smoothscale(image, (320, 320))
-				images.append(image)
-			GPIO.output(ledPin, GPIO.HIGH)
-			time.sleep(0.075)
-			GPIO.output(ledPin, GPIO.LOW)
-			time.sleep(0.075)
-			GPIO.output(ledPin, GPIO.HIGH)
-except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
-	GPIO.cleanup() # cleanup all GPIO
+
+	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
+		GPIO.cleanup() # cleanup all GPIO
+
+
+def showLastImage(pygameImages):
+	print('function')
+	for count in range(0,10): # show for 10 frames
+		image = pygameImages[zigzag[count % len(zigzag)]]
+		GUI.displayImage(image)
+		pygame.time.wait(100)
+	return [] # clearing buffer by returning []
+
+
+def captureImage():
+	GPIO.output(ledPin, GPIO.LOW)
+	frameBuffers = connectAndDownload(cons)
+	if(frameBuffers == False):
+		print("Connection error while capturing")
+		GUI.message('capture Error - could not connect')
+		time.sleep(1)
+		return []
+	pygameImages = []
+	for i in range(0, len(frameBuffers)):
+		image = pygame.image.load(frameBuffers[i])
+		image = pygame.transform.smoothscale(image, (320, 320))
+		pygameImages.append(image)
+	return pygameImages
+
+mainLoop(pygameImages)

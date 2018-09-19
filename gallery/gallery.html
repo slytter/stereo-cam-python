@@ -3,17 +3,56 @@ $def with (imagePaths)
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="static/style.css" />
-    <script>
-    var imagePaths = $:imagePaths 
-    </script> 
-    <script src="static/gallery.js"></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Gallery</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<link rel="stylesheet" href="../static/gallery/css/swiper.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="static/style.css" />
+	<script src="static/gallery.js"></script>
 </head>
 <body>
-    
+	
+
+<!-- Swiper --> 
+<div class="swiper-container">
+	<div class="swiper-wrapper">
+		$for i in imagePaths: 
+			<div class="swiper-slide">
+				<img data-src="/get-image/$i" class="swiper-lazy">
+				<div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+			</div>
+	</div>
+	<!-- Add Pagination -->
+	<div class="swiper-pagination swiper-pagination-white"></div>
+	<!-- Navigation -->
+	<div class="swiper-button-next swiper-button-white"></div>
+	<div class="swiper-button-prev swiper-button-white"></div>
+</div>
+
+<!-- Swiper JS -->
+<script src="../static/gallery/js/swiper.min.js"></script>
+
+<!-- Initialize Swiper -->
+<script>
+var swiper = new Swiper('.swiper-container', {
+	lazy: true,
+	loop: true,
+
+	scrollbar: {
+      el: '.swiper-scrollbar',
+    },
+	pagination: {
+        el: '.swiper-pagination',
+        type: 'fraction',
+	},
+	navigation: {
+		nextEl: '.swiper-button-next',
+		prevEl: '.swiper-button-prev',
+	},
+});
+</script>
+
 </body>
 </html>

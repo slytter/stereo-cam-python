@@ -5,6 +5,7 @@ from subprocess import Popen, PIPE, STDOUT
 import grequests
 import asyncio
 import GUI
+import time
 # from runcoroutine import runCoroutine
 _mayCheckConnections = True
 def enableConnectionCheck(enable):
@@ -39,6 +40,8 @@ class Connection : # place this in another doc please..
 def arePisConnected(cons, accuracy, loop = True):
 	print('Trying to connect to slaves')
 	for connection in cons :
+		if(mayCheckConnection() == False):
+			break
 		connection.updateConnection(accuracy)
 
 def checkClientStatus(cons):
@@ -63,4 +66,16 @@ def updateConnections(cons, eachSeconds):
 				time.sleep(1) # check again in 1 sec.
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
-		
+
+
+def shutDownPis(cons):
+	ips = map(lambda con: con.ip + con.port + 'shutdown', cons[1:]) 
+	# print('shutting down ' + len(ips) + ' connections')
+	for ip in ips:
+		print('shutting down ' + ip)
+	requests = (grequests.get(ip, timeout = 0.5) for ip in ips)
+	responses = grequests.map(requests)
+	GUI.message('shutting down camera')
+	print('shutting master in 5 seconds')
+	time.sleep(5)
+	os.system('sudo shutdown now')

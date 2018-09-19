@@ -5,25 +5,30 @@ import picamera
 import RPi.GPIO as GPIO
 import webGallery
 from webGallery import Gallery, GetImage
+import os
 
 readyPin = 15
 shutterInput = 14
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 #pwm = GPIO.PWM(pwmPin, 100)  # Initialize PWM on pwmPin 100Hz frequency
 GPIO.setup(shutterInput, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
 GPIO.setup(readyPin, GPIO.OUT) # LED pin set as output
+
 ok = False
 
 urls = (
     '/capture', 'Capture',
     '/status', 'Status',
     '/gallery', 'Gallery',
-    '/get-image', 'GetImage'
+    '/get-image/(.+)/(.*)', 'GetImage', 
+    '/update', 'Update',
+    '/shutdown', 'Shutdown'
 )
 
 # start with default values for resolution
-width = 1024
-height = 1024
+width = 1000
+height = 1000
 
 if __name__ == "__main__":
     app = web.application(urls, globals())
@@ -93,3 +98,13 @@ class Capture:
         web.header('Content-Type', 'image/jpg')
         print('Done. It took ' + str(time.time()-startTime) + ' to capture image')
         return stream.read()
+
+
+class Update:
+    def GET(self):
+        os.system('git pull && sudo reboot now')
+        return "error could not restart"
+
+class Shutdown:
+    def GET(self):
+        os.system('sudo shutdown')

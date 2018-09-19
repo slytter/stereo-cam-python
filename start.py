@@ -41,25 +41,27 @@ zigzag = sequenceGen.zigZag(len(cons))
 pygameImages = []
 pygame.time.set_timer(USEREVENT+1, int(1000/targetFps))
 
+
 def mainLoop(pygameImages):
 	try:
 		while 1:
 			if (GPIO.input(butPin) == GPIO.HIGH): # button is released
+				time.sleep(0.016) # sleep for ~ delta 60 fps
+				for event in pygame.event.get():
+					if event.type == USEREVENT+1:
+						GUI.defaultScreen(cons)
+				
 				if(GPIO.input(shutDownPin) == GPIO.LOW):
 					connections.shutDownPis(cons)
-				time.sleep(0.016) # sleep for ~ delta 60 fps
+				
 				if(len(pygameImages) > 0): # if any images in buffer,
 					pygameImages = showLastImage(pygameImages) # show them and remove them
-				else: #
-					for event in pygame.event.get():
-						if event.type == USEREVENT+1:
-							GUI.defaultScreen(cons)
+					
 			else: # button is pressed:
 				print('Shutter pressed')
 				connections.enableConnectionCheck(False)
 				pygameImages = captureImage()
 				connections.enableConnectionCheck(True)
-
 
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
@@ -89,4 +91,7 @@ def captureImage():
 		pygameImages.append(image)
 	return pygameImages
 
+
 mainLoop(pygameImages)
+
+

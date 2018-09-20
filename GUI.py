@@ -3,7 +3,10 @@ import os, pygame, time, math
 
 os.putenv('SDL_FBDEV', '/dev/fb0')
 pygame.init()
-DISPLAYSURF = pygame.display.set_mode((480, 320))
+
+DISPLAYSURF = pygame.Surface((480, 320), 32)
+# DISPLAYSURF = pygame.Surface((640, 426) ,32)
+window = pygame.display.set_mode((640, 480), pygame.RESIZABLE)
 
 ### TEXT RENDERS ###
 pygame.mouse.set_visible(False)
@@ -24,11 +27,13 @@ black = pygame.Color(0,0,0)
 red = pygame.Color(255,50,50)
 incrD = 0.0
 clock = pygame.time.Clock()
-s_w, s_h = pygame.display.get_surface().get_size()
+s_w, s_h = DISPLAYSURF.get_size()
 half = [s_w/2, s_h/2]
+
 
 def modColor(val):
 	return val % 255
+
 
 def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
 
@@ -45,7 +50,10 @@ def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
 	DISPLAYSURF.blit(img1,(half[0] - w/2, half[1] - h/2), (0, 0, s_w, s_h))
 	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] - text.get_height() // 2 + 50))
 	# pygame.draw.rect(DISPLAYSURF, pygame.Color(255,255,255), (0, 0, 480, 320))
-	pygame.display.update()
+	# pygame.transform.scale(DISPLAYSURF, (640, 480))
+	updateDisplay()
+
+
 
 def defaultScreen(cons):
 	clock.tick()
@@ -61,14 +69,12 @@ def defaultScreen(cons):
 
 	drawAnimation(ok, incrD)
 	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 9))
-	pygame.display.update()
-
-
+	updateDisplay()
 
 def displayImage(image):
 	DISPLAYSURF.fill(black)
 	DISPLAYSURF.blit(image, (80,0), (0, 0, s_w, s_h))
-	pygame.display.update()
+	updateDisplay()
 
 
 def drawAnimation(ok, incrD):
@@ -103,5 +109,10 @@ def renderConnectionDots(cons):
 
 def message(message):
 	text = font.render(message, True, (255, 255, 255))
-	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] - text.get_height() // 2 + 50))
+	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] + 100))
+	updateDisplay()
+
+
+def updateDisplay():
+	window.blit(pygame.transform.scale(DISPLAYSURF,(640,480)),(0,0))
 	pygame.display.update()

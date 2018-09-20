@@ -1,11 +1,19 @@
-import web
+import web, socket
 import io
 import time
 import picamera
 import RPi.GPIO as GPIO
-import webGallery
-from webGallery import Gallery, GetImage
-import os
+import argparse
+
+
+master = (socket.gethostname() == 'master')
+
+
+if(master):
+    print('running server as master')
+	import webGallery
+	from webGallery import Gallery, GetImage
+	import os
 
 readyPin = 15
 shutterInput = 14
@@ -17,14 +25,22 @@ GPIO.setup(readyPin, GPIO.OUT) # LED pin set as output
 
 ok = False
 
+
 urls = (
     '/capture', 'Capture',
     '/status', 'Status',
-    '/gallery', 'Gallery',
-    '/get-image/(.+)/(.*)', 'GetImage', 
     '/update', 'Update',
-    '/shutdown', 'Shutdown'
+    '/shutdown', 'Shutdown',
 )
+
+if(master):
+    masterUrls = (
+        '/gallery', 'Gallery',
+        '/get-image/(.+)/(.*)', 'GetImage',
+    )
+    urls = urls + masterUrls
+
+
 
 # start with default values for resolution
 width = 1000
@@ -93,6 +109,8 @@ class Capture:
             except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
                 GPIO.cleanup() # cleanup all GPIO
                 pwm.stop() # stop PWM
+            except:
+                pass
         # "Rewind" the stream to the beginning so we can read its content
         stream.seek(0)
         web.header('Content-Type', 'image/jpg')

@@ -15,9 +15,9 @@ pingAccuracy = 2
 
 cons = []
 cons.append(Connection('http://master.local', ':8080/'))
-# cons.append(Connection('http://slave1.local', ':8080/'))
-# cons.append(Connection('http://slave2.local', ':8080/'))
-# cons.append(Connection('http://slave3.local', ':8080/'))
+cons.append(Connection('http://slave1.local', ':8080/'))
+cons.append(Connection('http://slave2.local', ':8080/'))
+cons.append(Connection('http://slave3.local', ':8080/'))
 
 threading.Thread(target=connections.updateConnections, args=[cons, 5]).start() # Update connections in other thread.
 
@@ -68,8 +68,7 @@ def mainLoop(pygameImages):
 
 
 def showLastImage(pygameImages):
-	print('function')
-	for count in range(0,10): # show for 10 frames
+	for count in range(0,30): # show for 10 frames
 		image = pygameImages[zigzag[count % len(zigzag)]]
 		GUI.displayImage(image)
 		pygame.time.wait(100)
@@ -81,7 +80,7 @@ def captureImage():
 	frameBuffers = connectAndDownload(cons)
 	if(frameBuffers == False):
 		print("Connection error while capturing")
-		GUI.message('capture Error - could not connect')
+		GUI.message('capture error - could not connect')
 		time.sleep(1)
 		return []
 	pygameImages = []

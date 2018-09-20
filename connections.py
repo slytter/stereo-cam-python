@@ -30,15 +30,16 @@ class Connection : # place this in another doc please..
 		if(con != False) : # returning false if connection down, and the ping if up
 			self.ping = con
 			self.status = True
-			print('Connection up for ' + self.ip + ' with ping: ' + str(self.ping))
+			print('Ping connection up for ' + self.ip + ' with ping: ' + str(self.ping))
 			return True
 		else : 
 			self.status = False
-			print('Connection could not be established to ' + self.ip)
+			print('Ping connection could not be established to ' + self.ip)
 			return False
 
+
 def arePisConnected(cons, accuracy, loop = True):
-	print('Trying to connect to slaves')
+	print('Trying to ping-connect to slaves')
 	for connection in cons :
 		if(mayCheckConnection() == False):
 			break
@@ -50,17 +51,24 @@ def checkClientStatus(cons):
 	responses = grequests.map(requests)
 	for i in range(0, len(cons)):
 		if(responses[i] != None and responses[i].status_code == 200):
+			cons[i].status = True # status is ping connectivity, which must be up in this case.
 			cons[i].serverUp = True
 		else:
 			cons[i].serverUp = False
 
 
-def updateConnections(cons, eachSeconds):
+def updateConnections(cons, eachSeconds): # This function is ran outside the main thread. As a background connectivity check
 	try:
 		while 1: # Constantly check
 			if(mayCheckConnection()): # if permitted
-				arePisConnected(cons, 1, False) # that the pi's can be seen on the network.
 				checkClientStatus(cons) # and that the slave servers are up and returning 200
+				
+				# if the servers are down. The pi might be shut. Lets ping the disconnected pis:
+				disconnectedPis = list(filter(lambda x: x.serverUp == False, cons))
+				if(len(disconnectedPis) > 0):
+					print('Could not connect to ' + str(len(disconnectedPis)) + ' server(s). Trying to ping')
+					arePisConnected(disconnectedPis, 1, False) # that the pi's can be seen on the network.
+
 				time.sleep(eachSeconds) # then wait for a while
 			else: # if not permitted
 				time.sleep(1) # check again in 1 sec.

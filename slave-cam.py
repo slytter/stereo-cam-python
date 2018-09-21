@@ -3,17 +3,14 @@ import io
 import time
 import picamera
 import RPi.GPIO as GPIO
-import argparse
-
 
 master = (socket.gethostname() == 'master')
 
-
 if(master):
     print('running server as master')
-	import webGallery
-	from webGallery import Gallery, GetImage
-	import os
+    import webGallery
+    from webGallery import Gallery, GetImage
+    import os
 
 readyPin = 15
 shutterInput = 14
@@ -36,7 +33,7 @@ urls = (
 if(master):
     masterUrls = (
         '/gallery', 'Gallery',
-        '/get-image/(.+)/(.*)', 'GetImage',
+        '/get-image/(.+)/', 'GetImage',
     )
     urls = urls + masterUrls
 

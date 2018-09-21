@@ -32,7 +32,8 @@ def downloadImages(cons, _fps) :
 			imageBuffers.append(BytesIO(response.content))
 			#numpyBuffer.append(imageio.imread(BytesIO(response.content)))
 			#with open(name, 'wb') as f:
-			# f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
+			#Thread this:
+			f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
 		else:
 			return []
 		i += 1
@@ -41,7 +42,9 @@ def downloadImages(cons, _fps) :
 	GPIO.output(27, GPIO.LOW)
 	return imageBuffers
 
-
+def saveImage(image): #TODO
+	f.write(response.content)
+	print('image saved!')
 
 def connectAndDownload(cons):
 	started = time.time()

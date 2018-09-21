@@ -22,15 +22,15 @@ cons.append(Connection('http://slave3.local', ':8080/'))
 threading.Thread(target=connections.updateConnections, args=[cons, 5]).start() # Update connections in other thread.
 
 # Pin Definitons:
-ledPin = 27# Broadcom pin 23 (P1 pin 16)
+ledPin = 27
 butPin = 17 # Broadcom pin 17 (P1 pin 11)
-shutDownPin = 3 # Broadcom pin 17 (P1 pin 11)
+shutDownPin = 3
 
 # Pin Setup:
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 GPIO.setup(ledPin, GPIO.OUT) # LED pin set as output
 GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
-GPIO.setup(shutDownPin, GPIO.IN) # Button pin set as input w/ pull-up
+GPIO.setup(shutDownPin, GPIO.IN)
 GPIO.output(ledPin, GPIO.HIGH)
 GPIO.setwarnings(False)
 
@@ -49,7 +49,7 @@ def mainLoop(pygameImages):
 				time.sleep(0.016) # sleep for ~ delta 60 fps
 				for event in pygame.event.get():
 					if event.type == USEREVENT+1:
-						GUI.defaultScreen(cons)
+						GUI.defaultScreen(cons)	
 				
 				if(GPIO.input(shutDownPin) == GPIO.LOW):
 					connections.shutDownPis(cons)

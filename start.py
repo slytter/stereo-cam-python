@@ -14,8 +14,8 @@ status = False
 pingAccuracy = 2
 
 cons = []
-cons.append(Connection('http://master.local', ':8080/'))
 cons.append(Connection('http://slave1.local', ':8080/'))
+cons.append(Connection('http://master.local', ':8080/'))
 cons.append(Connection('http://slave2.local', ':8080/'))
 cons.append(Connection('http://slave3.local', ':8080/'))
 
@@ -41,8 +41,14 @@ zigzag = sequenceGen.zigZag(len(cons))
 pygameImages = []
 pygame.time.set_timer(USEREVENT+1, int(1000/targetFps))
 
+loading = False
+
+
+
+
 
 def mainLoop(pygameImages):
+	global loading
 	try:
 		while 1:
 			if (GPIO.input(butPin) == GPIO.HIGH): # button is released
@@ -56,18 +62,25 @@ def mainLoop(pygameImages):
 				
 				if(len(pygameImages) > 0): # if any images in buffer,
 					pygameImages = showLastImage(pygameImages) # show them and remove them
-					
+					loading = False
+			# elif(loading == True):
+			# 	loadingScreen()
 			else: # button is pressed:
 				print('Shutter pressed')
 				connections.enableConnectionCheck(False)
 				pygameImages = captureImage()
+				loading = True
 				connections.enableConnectionCheck(True)
 
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
 
 
+def loadingScreen():
+	GUI.message('please wait')
+
 def showLastImage(pygameImages):
+	print("showing images.")
 	for count in range(0,30): # show for 10 frames
 		image = pygameImages[zigzag[count % len(zigzag)]]
 		GUI.displayImage(image)
@@ -78,6 +91,7 @@ def showLastImage(pygameImages):
 def captureImage():
 	GPIO.output(ledPin, GPIO.LOW)
 	frameBuffers = connectAndDownload(cons)
+	GPIO.output(ledPin, GPIO.HIGH)
 	if(frameBuffers == False):
 		print("Connection error while capturing")
 		GUI.message('capture error - could not connect')

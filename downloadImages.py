@@ -4,6 +4,7 @@ import grequests
 import time
 import RPi.GPIO as GPIO
 from io import BytesIO
+import threading
 
 def downloadImages(cons, _fps) :
 	startTime = time.time()
@@ -31,9 +32,13 @@ def downloadImages(cons, _fps) :
 			paths.append(name)
 			imageBuffers.append(BytesIO(response.content))
 			#numpyBuffer.append(imageio.imread(BytesIO(response.content)))
-			#with open(name, 'wb') as f:
 			#Thread this:
-			f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
+			# with open(name, 'wb') as f:
+			# 	f.write(response.content) # TODO SAVE THIS IN A BUFFER INSTEAD OF WRITING AND READING TO COMPILE GIF
+
+			threading.Thread(target=saveImage, args=[response.content, name]).start() 
+			print('after thread is started.')
+			#saveImage(response.content, name)
 		else:
 			return []
 		i += 1
@@ -42,16 +47,18 @@ def downloadImages(cons, _fps) :
 	GPIO.output(27, GPIO.LOW)
 	return imageBuffers
 
-def saveImage(image): #TODO
-	f.write(response.content)
-	print('image saved!')
+def saveImage(image, name): 
+	print('from thread.')
+	with open(name, 'wb') as f:
+		f.write(image)
+		print(name + ': image saved!')
 
 def connectAndDownload(cons):
 	started = time.time()
 	print('Starting requests')
 	frameBuffers = downloadImages(cons, 10)
 	if(len(frameBuffers) != 0):
-		print('Succesfully downloaded and compiled. It took: ' + str(time.time()-started) + ' secs')
+		print('Succesfully downloaded. It took: ' + str(time.time()-started) + ' secs (w/ focus)')
 		return frameBuffers
 	else:
 		print('Download error')

@@ -1,7 +1,6 @@
 import os
 import web
 import json
-import glob
 import imageio
 
 imagePath = 'images'
@@ -62,7 +61,7 @@ class GetImage:
 def createGifFromPath(path):
 	numpyBuffer = []
 	print('input path: ' + path)
-	try:	
+	try:
 		for image in os.listdir(path):
 			ext = image.split(".")[-1] # Gather extension
 			if(ext == 'jpg'):

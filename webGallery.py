@@ -67,6 +67,7 @@ def createGifFromPath(path):
 
 	try:
 		# for image in os.listdir(path):
+		zigZag = sequenceGen.zigZag(len(numpyBuffer))
 
 		for image in os.listdir(path):
 			ext = image.split(".")[-1] # Gather extension
@@ -75,7 +76,6 @@ def createGifFromPath(path):
 				print('appending image path: ' + imageRelPath)
 				numpyBuffer.append(imageio.imread(imageRelPath))
 
-		zigZag = sequenceGen.zigZag(len(numpyBuffer))
 		gif = imageio.mimwrite(imageio.RETURN_BYTES, numpyBuffer, format='gif', fps=_fps)
 		name = path + '/compiled.gif'
 		threading.Thread(target=saveImage, args=[gif, name]).start() # save image in thread.

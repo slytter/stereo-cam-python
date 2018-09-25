@@ -68,7 +68,10 @@ def defaultScreen(cons):
 
 	drawAnimation(ok, incrD)
 	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 9))
+	text = small_font.render(message, True, white)
+	DISPLAYSURF.blit('hold shutter to SuperSync', (half[0] - text.get_width() // 2, half[1] + 80))
 	updateDisplay()
+
 
 def displayImage(image):
 	DISPLAYSURF.fill(black)
@@ -112,8 +115,8 @@ def message(message, wipe_screen = False):
 	if(wipe_screen):
 		verticalDisplacement = -text.get_height()
 		DISPLAYSURF.fill(black)
+		pygame.draw.line(DISPLAYSURF, white, (half[0] - 35, half[1] + 10), (half[0] + 35, half[1] + 10))
 	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] + verticalDisplacement))
-	pygame.draw.line(DISPLAYSURF, white, (half[0] - 35, half[1] + 10), (half[0] + 35, half[1] + 10))
 	updateDisplay()
 
 

@@ -53,9 +53,6 @@ def mainLoop(pygameImages):
 
 	STATE = State()
 
-	loading = False
-	program_state = 'DEFAULT'
-
 	try:
 		while 1:
 			
@@ -71,7 +68,7 @@ def mainLoop(pygameImages):
 			elif(GPIO.input(shutDownPin) == GPIO.LOW):
 				program_state = STATE.SHUT_DOWN
 
-			time.sleep(0.016) # sleep for ~ delta 60 fps
+			time.sleep(0.01) # sleep for ~ delta 60 fps
 
 			##########################
 			# Exacution block:
@@ -87,19 +84,16 @@ def mainLoop(pygameImages):
 				loadingScreen()
 				pygameImages = captureImage()
 				connections.enableConnectionCheck(True)
-				program_state = STATE.LOADING
 
 			elif(program_state == STATE.SHOW_IMAGE):
 				pygameImages = showLastImage(pygameImages) # show them and remove them
-		
-			elif(program_state == STATE.LOADING):
-				program_state = STATE.SHOW_IMAGE
 
 			elif(program_state == STATE.SHUT_DOWN):
 				connections.shutDownPis(cons)
 
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
+		pygame.quit()
 
 
 def loadingScreen():

@@ -38,25 +38,6 @@ class Connection : # place this in another doc please..
 			return False
 
 
-def arePisConnected(cons, accuracy, loop = True):
-	print('Trying to ping-connect to slaves')
-	for connection in cons :
-		if(mayCheckConnection() == False):
-			break
-		connection.updateConnection(accuracy)
-
-def checkClientStatus(cons):
-	ips = map(lambda con: con.ip + con.port + 'status', cons) # reversed pings instead of pings
-	requests = (grequests.get(ip, timeout = 0.5) for ip in ips)
-	responses = grequests.map(requests)
-	for i in range(0, len(cons)):
-		if(responses[i] != None and responses[i].status_code == 200):
-			cons[i].status = True # status is ping connectivity, which must be up in this case.
-			cons[i].serverUp = True
-		else:
-			cons[i].serverUp = False
-
-
 def updateConnections(cons, eachSeconds): # This function is ran outside the main thread. As a background connectivity check
 	try:
 		while 1: # Constantly check
@@ -74,6 +55,26 @@ def updateConnections(cons, eachSeconds): # This function is ran outside the mai
 				time.sleep(1) # check again in 1 sec.
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
+
+
+
+def arePisConnected(cons, accuracy, loop = True):
+	print('Trying to ping-connect to slaves')
+	for connection in cons :
+		if(mayCheckConnection() == False):
+			break
+		connection.updateConnection(accuracy)
+
+def checkClientStatus(cons):
+	ips = map(lambda con: con.ip + con.port + 'status', cons) # reversed pings instead of pings
+	requests = (grequests.get(ip, timeout = 1) for ip in ips)
+	responses = grequests.map(requests)
+	for i in range(0, len(cons)):
+		if(responses[i] != None and responses[i].status_code == 200):
+			cons[i].status = True # status is ping connectivity, which must be up in this case.
+			cons[i].serverUp = True
+		else:
+			cons[i].serverUp = False
 
 
 def shutDownPis(cons):

@@ -36,7 +36,6 @@ def modColor(val):
 
 
 def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
-
 	if(anyConnectionDown > 0):
 		GUI.loadingScreen(str(anyConnectionDown) + ' connection' + ('' if(anyConnectionDown == 1) else 's') + ' down')
 		GUI.renderConnectionDots(cons)
@@ -107,9 +106,14 @@ def renderConnectionDots(cons):
 			pygame.draw.ellipse(DISPLAYSURF, black, (12 + 30 * i, 12, 16, 16))
 	return ok
 
-def message(message):
-	text = font.render(message, True, (255, 255, 255))
-	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] + 100))
+def message(message, wipe_screen = False):
+	text = small_font.render(message, True, white)
+	verticalDisplacement = 80
+	if(wipe_screen):
+		verticalDisplacement = -text.get_height()
+		DISPLAYSURF.fill(black)
+	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] + verticalDisplacement))
+	pygame.draw.line(DISPLAYSURF, white, (half[0] - 35, half[1] + 10), (half[0] + 35, half[1] + 10))
 	updateDisplay()
 
 

@@ -41,43 +41,69 @@ zigzag = sequenceGen.zigZag(len(cons))
 pygameImages = []
 pygame.time.set_timer(USEREVENT+1, int(1000/targetFps))
 
-loading = False
-
-
-
-
 
 def mainLoop(pygameImages):
-	global loading
+	class State:
+		#optimize by making STATE numbers instead of string
+		DEFAULT = 0
+		LOADING = 1
+		CAPTURE = 2
+		SHUT_DOWN = 3
+		SHOW_IMAGE = 4
+
+	STATE = State()
+
+	loading = False
+	program_state = 'DEFAULT'
+
 	try:
 		while 1:
+			
+			##########################
+			# Control block:
+			##########################
 			if (GPIO.input(butPin) == GPIO.HIGH): # button is released
-				time.sleep(0.016) # sleep for ~ delta 60 fps
+				program_state = STATE.DEFAULT
+			else:
+				program_state = STATE.CAPTURE
+			if(len(pygameImages) > 0): # if any images in buffer,
+				program_state = STATE.SHOW_IMAGE
+			elif(GPIO.input(shutDownPin) == GPIO.LOW):
+				program_state = STATE.SHUT_DOWN
+
+			time.sleep(0.016) # sleep for ~ delta 60 fps
+
+			##########################
+			# Exacution block:
+			##########################
+			if(program_state == STATE.DEFAULT):
 				for event in pygame.event.get():
 					if event.type == USEREVENT+1:
 						GUI.defaultScreen(cons)	
-				
-				if(GPIO.input(shutDownPin) == GPIO.LOW):
-					connections.shutDownPis(cons)
-				
-				if(len(pygameImages) > 0): # if any images in buffer,
-					pygameImages = showLastImage(pygameImages) # show them and remove them
-					loading = False
-			# elif(loading == True):
-			# 	loadingScreen()
-			else: # button is pressed:
+
+			elif(program_state == STATE.CAPTURE):
 				print('Shutter pressed')
 				connections.enableConnectionCheck(False)
+				loadingScreen()
 				pygameImages = captureImage()
-				loading = True
 				connections.enableConnectionCheck(True)
+				program_state = STATE.LOADING
+
+			elif(program_state == STATE.SHOW_IMAGE):
+				pygameImages = showLastImage(pygameImages) # show them and remove them
+		
+			elif(program_state == STATE.LOADING):
+				program_state = STATE.SHOW_IMAGE
+
+			elif(program_state == STATE.SHUT_DOWN):
+				connections.shutDownPis(cons)
 
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
 
 
 def loadingScreen():
-	GUI.message('please wait')
+	GUI.message('please wait', True)
 
 def showLastImage(pygameImages):
 	print("showing images.")
@@ -100,7 +126,8 @@ def captureImage():
 	pygameImages = []
 	for i in range(0, len(frameBuffers)):
 		image = pygame.image.load(frameBuffers[i])
-		image = pygame.transform.smoothscale(image, (320, 320))
+		#image = pygame.transform.smoothscale(image, (320, 320)) #Smoothscale will output a better result. But slower.
+		image = pygame.transform.scale(image, (320, 320))
 		pygameImages.append(image)
 	return pygameImages
 

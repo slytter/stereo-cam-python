@@ -9,32 +9,41 @@ import pygame
 from pygame.locals import USEREVENT
 import threading
 import sequenceGen
-
+import lib
+import gallery
 status = False
 pingAccuracy = 2
 
 cons = []
 cons.append(Connection('http://slave1.local', ':8080/'))
-cons.append(Connection('http://slave3.local', ':8080/'))
-cons.append(Connection('http://master.local', ':8080/'))
-cons.append(Connection('http://slave2.local', ':8080/'))
+# cons.append(Connection('http://master.local', ':8080/'))
+cons.append(Connection('http://master2.local', ':8080/'))
+# cons.append(Connection('http://slave2.local', ':8080/'))
+# cons.append(Connection('http://slave3.local', ':8080/'))
 
 connectionThread = threading.Thread(target=connections.updateConnections, args=[cons, 5]) # Update connections in other thread.
 connectionThread.start()
 
 # Pin Definitons:
-ledPin = 27
-butPin = 17 # Broadcom pin 17 (P1 pin 11)
+ledPin = 21
+butPin = 20 # Broadcom pin 17 (P1 pin 11)
 shutDownPin = 3
-
+mainButton = 5
+scrollRight = 13
+scrollLeft = 6
 # Pin Setup:
-GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
-GPIO.setup(ledPin, GPIO.OUT) # LED pin set as output
-GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
-GPIO.setup(shutDownPin, GPIO.IN)
-GPIO.output(ledPin, GPIO.HIGH)
 GPIO.setwarnings(False)
 
+GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
+GPIO.setup(ledPin, GPIO.OUT) # LED pin set as output
+
+GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
+GPIO.setup(scrollRight, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
+GPIO.setup(scrollLeft, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
+GPIO.setup(mainButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Button pin set as input w/ pull-up
+GPIO.setup(shutDownPin, GPIO.IN)
+
+GPIO.output(ledPin, GPIO.HIGH)
 GUI.loadingScreen()
 
 targetFps = 30
@@ -43,35 +52,53 @@ pygameImages = []
 pygame.time.set_timer(USEREVENT+1, int(1000/targetFps))
 
 
+class State:
+	DEFAULT = 0
+	LOADING = 1
+	CAPTURE = 2
+	SHUT_DOWN = 3
+	SHOW_IMAGE = 4
+	GALLERY = 5
+
+clock = pygame.time.Clock()
+STATE = State()
+program_state = 0
+
+
 def mainLoop(pygameImages):
-	class State:
-		#optimize by making STATE numbers instead of string
-		DEFAULT = 0
-		LOADING = 1
-		CAPTURE = 2
-		SHUT_DOWN = 3
-		SHOW_IMAGE = 4
-
-	STATE = State()
-	clock = pygame.time.Clock()
-
 	try:
 		while 1:
-			
+			##########################
+			# Toggle Block:
+			##########################
+			# elif(GPIO.input(scrollRight) == GPIO.LOW):
+			# 	print("test")
 			##########################
 			# Control block:
 			##########################
-			if (GPIO.input(butPin) == GPIO.HIGH): # button is released
-				program_state = STATE.DEFAULT
-			else:
+			global program_state
+			if (GPIO.input(butPin) == GPIO.LOW): # Shutter button is pressed
 				program_state = STATE.CAPTURE
-			if(len(pygameImages) > 0): # if any images in buffer,
+				print('test1')
+			elif(len(pygameImages) > 0): # if any images in buffer,
 				program_state = STATE.SHOW_IMAGE
-			elif(GPIO.input(shutDownPin) == GPIO.LOW):
-				program_state = STATE.SHUT_DOWN
-			
-			clock.tick(20)
+				print('test2')
+			elif(GPIO.input(shutDownPin) == GPIO.LOW): 
+				program_state = STATE.SHUT_DOWN			
 			# time.sleep(0.01) # sleep for ~ delta 60 fps
+			elif(GPIO.input(mainButton) == GPIO.LOW): #If gallery button is pressed
+				print(program_state)
+				if(program_state == STATE.GALLERY): # if we are 
+					program_state = STATE.DEFAULT
+				else:
+					program_state = STATE.GALLERY
+					gallery.setup()
+				lib.waitForPullUp(mainButton)
+
+			elif(program_state != STATE.GALLERY):
+				program_state = STATE.DEFAULT
+			time.sleep(0.01) # sleep for ~ delta 60 fps
+      clock.tick(20)
 
 			##########################
 			# Exacution block:
@@ -93,7 +120,18 @@ def mainLoop(pygameImages):
 
 			elif(program_state == STATE.SHUT_DOWN):
 				connections.shutDownPis(cons)
-	except KeyboardInterrupt:
+			elif(program_state == STATE.GALLERY):
+				gallery.draw()
+				if(GPIO.input(scrollLeft) == GPIO.LOW):
+					GUI.gallery(-1)
+					lib.waitXThenPullUp(scrollLeft, 50)
+				elif(GPIO.input(scrollRight) == GPIO.LOW):
+					GUI.gallery(1)
+					lib.waitXThenPullUp(scrollRight, 50)
+				else:
+					GUI.gallery()
+
+	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
 		connectionThread.stop()
 		pygame.quit()
@@ -109,6 +147,7 @@ def mainLoop(pygameImages):
 def loadingScreen():
 	GUI.message('please wait', True)
 
+
 def showLastImage(pygameImages):
 	print("showing images.")
 	for count in range(0,30): # show for 10 frames
@@ -120,22 +159,31 @@ def showLastImage(pygameImages):
 
 def captureImage():
 	GPIO.output(ledPin, GPIO.LOW)
-	frameBuffers = connectAndDownload(cons)
+	try:
+		frameBuffers, thumpImageNames = connectAndDownload(cons)
+	except TypeError as e:
+		GUI.message("One or more slave(s) returned 500")
+		time.sleep(2)
+		return []
+	except Exception as e:
+		GUI.message(str(e))
+		time.sleep(2)
+		return []
+
 	GPIO.output(ledPin, GPIO.HIGH)
 	if(frameBuffers == False):
 		print("Connection error while capturing")
 		GUI.message('capture error - could not connect')
-		time.sleep(1)
+		time.sleep(1.5)
 		return []
 	pygameImages = []
 	for i in range(0, len(frameBuffers)):
 		image = pygame.image.load(frameBuffers[i])
 		#image = pygame.transform.smoothscale(image, (320, 320)) #Smoothscale will output a better result. But slower.
 		image = pygame.transform.scale(image, (320, 320))
+		pygame.image.save(image, thumpImageNames[i])
 		pygameImages.append(image)
 	return pygameImages
 
 
 mainLoop(pygameImages)
-
-

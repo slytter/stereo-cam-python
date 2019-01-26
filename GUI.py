@@ -1,9 +1,9 @@
 import os, pygame, time, math
 # from runcoroutine import runCoroutine
+import gallery as galleryController
 
 os.putenv('SDL_FBDEV', '/dev/fb0')
 pygame.init()
-
 DISPLAYSURF = pygame.Surface((480, 320), 32)
 # DISPLAYSURF = pygame.Surface((640, 426) ,32)
 window = pygame.display.set_mode((640, 480), pygame.RESIZABLE)
@@ -13,7 +13,6 @@ pygame.mouse.set_visible(False)
 font = pygame.font.Font("Futura.ttc", 20)
 small_font = pygame.font.Font("Futura.ttc", 15)
 frontScreenText1 = font.render("shutter ready", True, (255, 255, 255))
-
 
 img1 = pygame.image.load(os.path.join('graphics/slyt_logo.png')).convert_alpha()
 w,h = img1.get_size()
@@ -28,6 +27,16 @@ red = pygame.Color(255,50,50)
 incrD = 0.0
 s_w, s_h = DISPLAYSURF.get_size()
 half = [s_w/2, s_h/2]
+
+
+def gallery(direction = 0):
+	if(direction != 0):
+		galleryController.switchImage(direction)
+		return None
+	# DISPLAYSURF.fill(black)
+	# text = font.render("gallery", True, white)
+	# DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] - text.get_height() // 2 + 50))
+	galleryController.draw()
 
 
 def modColor(val):
@@ -68,14 +77,16 @@ def defaultScreen(cons):
 	text = small_font.render('hold shutter to SuperSync', True, white)
 	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] + 60))
 	# pygame.draw.line(DISPLAYSURF, white, (half[0] - 35, half[1] + 57), (half[0] + 35, half[1] + 57))
-
 	updateDisplay()
 
 
-def displayImage(image):
+def displayImage(image, index = None):
 	DISPLAYSURF.fill(black)
 	DISPLAYSURF.blit(image, (80,0), (0, 0, s_w, s_h))
-	updateDisplay()
+	if(index != None):
+		message(str(index))
+	else:
+		updateDisplay()
 
 
 def drawAnimation(ok, incrD):

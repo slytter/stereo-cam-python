@@ -4,16 +4,21 @@ import time
 import picamera
 import RPi.GPIO as GPIO
 
-master = (socket.gethostname() == 'master')
+master = (socket.gethostname() == 'master' or socket.gethostname() == 'master2' )
+
+readyPin = 15
+shutterInput = 14
 
 if(master):
     print('running server as master')
     import webGallery
     from webGallery import Gallery, GetImage
     import os
+    readyPin = 26
+    shutterInput = 19
 
-readyPin = 15
-shutterInput = 14
+
+
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
 #pwm = GPIO.PWM(pwmPin, 100)  # Initialize PWM on pwmPin 100Hz frequency

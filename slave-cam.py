@@ -99,15 +99,18 @@ class Capture:
             GPIO.output(readyPin, GPIO.HIGH)
             try:
                 while imageCaptured == False:
-                    if  (GPIO.input(shutterInput) == True): # button is released
+                    if  (GPIO.input(shutterInput) == GPIO.HIGH): # button is released
                         GPIO.output(readyPin, GPIO.LOW) # illustrate ready state 
-                        print('Button released, capturing...')
+                        print('exp: 1/' + str(1000.0 / (camera.exposure_speed / 1000)))
                         camera.capture(stream, format='jpeg')
+                        print('Button released, capturing...')
                         imageCaptured = True
                         GPIO.output(readyPin, GPIO.HIGH)
-                        time.sleep(0.01)
+                        time.sleep(0.0005) # 1/2000 shutter time accuracy
                         GPIO.output(readyPin, GPIO.LOW)
                         break
+                    # else:
+                       #time.sleep(0.005) # 1/200 shutter time accuracy
             except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
                 GPIO.cleanup() # cleanup all GPIO
                 pwm.stop() # stop PWM

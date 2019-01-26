@@ -25,7 +25,6 @@ white = pygame.Color(255,255,255)
 black = pygame.Color(0,0,0)
 red = pygame.Color(255,50,50)
 incrD = 0.0
-clock = pygame.time.Clock()
 s_w, s_h = DISPLAYSURF.get_size()
 half = [s_w/2, s_h/2]
 
@@ -49,7 +48,6 @@ def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
 		GUI.loadingScreen(str(anyConnectionDown) + ' connection' + ('' if(anyConnectionDown == 1) else 's') + ' down')
 		GUI.renderConnectionDots(cons)
 		GUI.pygame.display.update()
-
 	global incr
 	incr+=15
 	text = font.render(msg, True, white)
@@ -64,7 +62,6 @@ def loadingScreen(msg = 'loading', cons = None, anyConnectionDown = 0):
 
 
 def defaultScreen(cons):
-	clock.tick()
 	DISPLAYSURF.fill(black)
 	global incrD 
 	incrD += 1.0
@@ -77,8 +74,9 @@ def defaultScreen(cons):
 
 	drawAnimation(ok, incrD)
 	DISPLAYSURF.blit(okmsg, ((len(cons) * 30) + 10, 9))
-	text = small_font.render("okmsg", True, white)
-	# DISPLAYSURF.blit('hold shutter to SuperSync', (half[0] - text.get_width() // 2, half[1] + 80))
+	text = small_font.render('hold shutter to SuperSync', True, white)
+	DISPLAYSURF.blit(text, (half[0] - text.get_width() // 2, half[1] + 60))
+	# pygame.draw.line(DISPLAYSURF, white, (half[0] - 35, half[1] + 57), (half[0] + 35, half[1] + 57))
 	updateDisplay()
 
 
@@ -113,7 +111,7 @@ def renderConnectionDots(cons):
 		ind_col = white
 		if(cons[i].status == False):
 			ind_col = pygame.Color(255,50,50)
-		elif(cons[i].ping > 30):
+		elif(cons[i].ping > 20):
 			ind_col = pygame.Color(255,255,50)
 		pygame.draw.ellipse(DISPLAYSURF, ind_col, (10 + 30 * i, 10, 20, 20))
 		if (cons[i].status == False or cons[i].serverUp == False):
@@ -123,7 +121,7 @@ def renderConnectionDots(cons):
 
 def message(message, wipe_screen = False):
 	text = small_font.render(message, True, white)
-	verticalDisplacement = 80
+	verticalDisplacement = 100
 	if(wipe_screen):
 		verticalDisplacement = -text.get_height()
 		DISPLAYSURF.fill(black)

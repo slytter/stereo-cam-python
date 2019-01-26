@@ -21,7 +21,8 @@ cons.append(Connection('http://master2.local', ':8080/'))
 # cons.append(Connection('http://slave2.local', ':8080/'))
 # cons.append(Connection('http://slave3.local', ':8080/'))
 
-threading.Thread(target=connections.updateConnections, args=[cons, 5]).start() # Update connections in other thread.
+connectionThread = threading.Thread(target=connections.updateConnections, args=[cons, 5]) # Update connections in other thread.
+connectionThread.start()
 
 # Pin Definitons:
 ledPin = 21
@@ -59,6 +60,7 @@ class State:
 	SHOW_IMAGE = 4
 	GALLERY = 5
 
+clock = pygame.time.Clock()
 STATE = State()
 program_state = 0
 
@@ -82,7 +84,8 @@ def mainLoop(pygameImages):
 				program_state = STATE.SHOW_IMAGE
 				print('test2')
 			elif(GPIO.input(shutDownPin) == GPIO.LOW): 
-				program_state = STATE.SHUT_DOWN
+				program_state = STATE.SHUT_DOWN			
+			# time.sleep(0.01) # sleep for ~ delta 60 fps
 			elif(GPIO.input(mainButton) == GPIO.LOW): #If gallery button is pressed
 				print(program_state)
 				if(program_state == STATE.GALLERY): # if we are 
@@ -95,6 +98,7 @@ def mainLoop(pygameImages):
 			elif(program_state != STATE.GALLERY):
 				program_state = STATE.DEFAULT
 			time.sleep(0.01) # sleep for ~ delta 60 fps
+      clock.tick(20)
 
 			##########################
 			# Exacution block:
@@ -129,7 +133,15 @@ def mainLoop(pygameImages):
 
 	except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
 		GPIO.cleanup() # cleanup all GPIO
+		connectionThread.stop()
 		pygame.quit()
+		return None
+
+	except Exception as e: #Should not close the program on error! Just log message on screen and continue. 
+		print('Error in main-loop: ' + str(e))
+		GUI.message(str(e))
+		time.sleep(2)
+		mainLoop(pygameImages)
 
 
 def loadingScreen():

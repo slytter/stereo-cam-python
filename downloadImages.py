@@ -27,20 +27,17 @@ def downloadImages(cons, _fps) :
 	i = 0 
 	imageBuffers = []
 	numpyBuffer = [] 
-	starting = time.time()
 	thumpImageNames = [] # thumpnails will be saved later for performance
+	thumpNailPath = 'images/' + str(timeStamp) + '/thump/'
+	os.makedirs(thumpNailPath)
 	for response in responses:
 		if (response and 199 < response.status_code < 400):
 			name = 'images/' + str(timeStamp) + '/' + str(i) + '.jpg'
 			paths.append(name)
 			imageBuffers.append(BytesIO(response.content))
-			thumpNailPath = 'images/' + str(timeStamp) + '/thump/'
-			os.makedirs(thumpNailPath)
 			thumpImageNames.append(thumpNailPath + str(i) + '.jpg')
 			threading.Thread(target=saveImage, args=[response.content, name]).start() 
 			print('after thread is started.')
-		else:
-			return []
 		i += 1
 	print('It took ' + str(time.time()-startTime) + 'to download images')
 	#imageio.mimsave(basePath + '/compiled.gif', numpyBuffer, fps=_fps)

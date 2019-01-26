@@ -98,7 +98,7 @@ def mainLoop(pygameImages):
 			elif(program_state != STATE.GALLERY):
 				program_state = STATE.DEFAULT
 			time.sleep(0.01) # sleep for ~ delta 60 fps
-      clock.tick(20)
+			clock.tick(20)
 
 			##########################
 			# Exacution block:
@@ -137,11 +137,11 @@ def mainLoop(pygameImages):
 		pygame.quit()
 		return None
 
-	except Exception as e: #Should not close the program on error! Just log message on screen and continue. 
-		print('Error in main-loop: ' + str(e))
-		GUI.message(str(e))
-		time.sleep(2)
-		mainLoop(pygameImages)
+	# except Exception as e: #Should not close the program on error! Just log message on screen and continue. 
+	# 	print('Error in main-loop: ' + str(e))
+	# 	GUI.message(str(e))
+	# 	time.sleep(2)
+	# 	mainLoop(pygameImages)
 
 
 def loadingScreen():
@@ -159,8 +159,9 @@ def showLastImage(pygameImages):
 
 def captureImage():
 	GPIO.output(ledPin, GPIO.LOW)
+	frameBuffers, thumpImageNames = connectAndDownload(cons)
 	try:
-		frameBuffers, thumpImageNames = connectAndDownload(cons)
+		print('test')
 	except TypeError as e:
 		GUI.message("One or more slave(s) returned 500")
 		time.sleep(2)

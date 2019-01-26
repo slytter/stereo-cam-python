@@ -1,7 +1,9 @@
 import os
 import web
 import json
-import gallery
+import sequenceGen
+import imageio
+import threading
 
 paths = []
 
@@ -10,11 +12,13 @@ cType = {
 	"jpg":"images/jpeg",
 	"gif":"images/gif",
 }
+imagePath = 'images'
+_fps = 10
 
 class Gallery:
 	def GET(self):
 		global paths
-		paths = gallery.getImagePaths()
+		paths = getImagePaths()
 		web.header('Content-Type', 'text/html')
 		render = web.template.render('gallery/')
 		jsonPaths = json.dumps(paths)
@@ -30,7 +34,7 @@ class GetImage:
 			print('Serving existing gif')
 		else:
 			print('Gif not found. Compiling jpgs')
-			gif = gallery.createGifFromPath('images/' + path)
+			gif = createGifFromPath('images/' + path)
 			if(gif == False):
 				raise web.notfound()
 			web.header("Content-Type", cType[ext]) 
@@ -45,3 +49,41 @@ class GetImage:
 			raise web.notfound()
 
 
+
+def createGifFromPath(path):
+	numpyBuffer = []
+	print('input path: ' + path)
+
+	try:
+		# for image in os.listdir(path):
+		zigZag = sequenceGen.zigZag(len(numpyBuffer))
+
+		for image in os.listdir(path):
+			ext = image.split(".")[-1] # Gather extension
+			if(ext == 'jpg'):
+				imageRelPath = path + '/' + image
+				print('appending image path: ' + imageRelPath)
+				numpyBuffer.append(imageio.imread(imageRelPath))
+
+		gif = imageio.mimwrite(imageio.RETURN_BYTES, numpyBuffer, format='gif', fps=_fps)
+		name = path + '/compiled.gif'
+		threading.Thread(target=saveImage, args=[gif, name]).start() # save image in thread.
+		return gif # and serve the buffer to client in the mean time.
+	except Exception as e:
+		print('could not compile gifs Error: ' + str(e))
+		return False
+
+
+def saveImage(gif, name): 
+	with open(name, 'wb') as f:
+		f.write(gif)
+		print(name + ': image saved!')
+
+
+def getImagePaths():
+	gifPaths = []
+	for filename in os.listdir(imagePath):
+		currentPath = filename + '/'
+		if(os.path.exists('images/' + currentPath + '/0.jpg') or os.path.exists('images/' + currentPath + '/compiled.gif')): #only serve images where at least 1 image is present.
+			gifPaths.append(currentPath)
+	return sorted(gifPaths)

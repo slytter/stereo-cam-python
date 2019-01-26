@@ -11,7 +11,6 @@ shutterInput = 14
 
 if(master):
     print('running server as master')
-    import webGallery
     from webGallery import Gallery, GetImage
     import os
     readyPin = 26
@@ -101,7 +100,7 @@ class Capture:
                 while imageCaptured == False:
                     if  (GPIO.input(shutterInput) == GPIO.HIGH): # button is released
                         GPIO.output(readyPin, GPIO.LOW) # illustrate ready state 
-                        print('exp: 1/' + str(1000.0 / (camera.exposure_speed / 1000)))
+                        # print('exp: 1/' + str(1000.0 / (camera.exposure_speed / 1000)))
                         camera.capture(stream, format='jpeg')
                         print('Button released, capturing...')
                         imageCaptured = True
@@ -114,13 +113,14 @@ class Capture:
             except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
                 GPIO.cleanup() # cleanup all GPIO
                 pwm.stop() # stop PWM
-            except:
-                pass
-        # "Rewind" the stream to the beginning so we can read its content
-        stream.seek(0)
-        web.header('Content-Type', 'image/jpg')
-        print('Done. It took ' + str(time.time()-startTime) + ' to capture image')
-        return stream.read()
+            # except Exception as e:
+            #     print(e)
+            #     pass
+            # "Rewind" the stream to the beginning so we can read its content
+            stream.seek(0)
+            web.header('Content-Type', 'image/jpg')
+            print('Done. It took ' + str(time.time()-startTime) + ' to capture image')
+            return stream.read()
 
 
 class Update:

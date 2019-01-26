@@ -15,7 +15,7 @@ status = False
 pingAccuracy = 2
 
 cons = []
-# cons.append(Connection('http://slave1.local', ':8080/'))
+cons.append(Connection('http://slave1.local', ':8080/'))
 # cons.append(Connection('http://master.local', ':8080/'))
 cons.append(Connection('http://master2.local', ':8080/'))
 # cons.append(Connection('http://slave2.local', ':8080/'))
@@ -120,8 +120,10 @@ def mainLoop(pygameImages):
 				gallery.draw()
 				if(GPIO.input(scrollLeft) == GPIO.LOW):
 					GUI.gallery(-1)
+					lib.waitXThenPullUp(scrollLeft, 50)
 				elif(GPIO.input(scrollRight) == GPIO.LOW):
 					GUI.gallery(1)
+					lib.waitXThenPullUp(scrollRight, 50)
 				else:
 					GUI.gallery()
 
@@ -145,12 +147,22 @@ def showLastImage(pygameImages):
 
 def captureImage():
 	GPIO.output(ledPin, GPIO.LOW)
-	frameBuffers, thumpImageNames = connectAndDownload(cons)
+	try:
+		frameBuffers, thumpImageNames = connectAndDownload(cons)
+	except TypeError as e:
+		GUI.message("One or more slave(s) returned 500")
+		time.sleep(2)
+		return []
+	except Exception as e:
+		GUI.message(str(e))
+		time.sleep(2)
+		return []
+
 	GPIO.output(ledPin, GPIO.HIGH)
 	if(frameBuffers == False):
 		print("Connection error while capturing")
 		GUI.message('capture error - could not connect')
-		time.sleep(1)
+		time.sleep(1.5)
 		return []
 	pygameImages = []
 	for i in range(0, len(frameBuffers)):

@@ -4,7 +4,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	printf "\n - Changing to ad-hoc \n"
 	sudo bash -c "cat interface_configs/ad-hoc > /etc/network/interfaces"
-	sudo ifup wlan0
+	sudo ifdown wlan0 --force
+	sudo ifup wlan0 --force
+
 else
 	printf "\n - Changing to normal wifi \n"
 	sudo bash -c "cat interface_configs/wifi > /etc/network/interfaces"

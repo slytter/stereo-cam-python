@@ -44,7 +44,7 @@ def updateConnections(cons, eachSeconds): # This function is ran outside the mai
 			if(mayCheckConnection()): # if permitted
 				checkClientStatus(cons) # and that the slave servers are up and returning 200
 				
-				# if the servers are down. The pi might be shut. Lets ping the disconnected pis:
+				# if a server is down. The pi might be shut. Lets ping the disconnected pis:
 				disconnectedPis = list(filter(lambda x: x.serverUp == False, cons))
 				if(len(disconnectedPis) > 0):
 					print('Could not connect to ' + str(len(disconnectedPis)) + ' server(s). Trying to ping')
@@ -67,13 +67,14 @@ def arePisConnected(cons, accuracy, loop = True):
 
 def checkClientStatus(cons):
 	ips = map(lambda con: con.ip + con.port + 'status', cons) # reversed pings instead of pings
-	requests = (grequests.get(ip, timeout = 1) for ip in ips)
+	requests = (grequests.get(ip, timeout = 2) for ip in ips)
 	responses = grequests.map(requests)
 	for i in range(0, len(cons)):
 		if(responses[i] != None and responses[i].status_code == 200):
 			cons[i].status = True # status is ping connectivity, which must be up in this case.
 			cons[i].serverUp = True
 		else:
+			print('server down. response: ' + str(responses[i]))
 			cons[i].serverUp = False
 
 

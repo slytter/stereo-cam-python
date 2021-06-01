@@ -16,5 +16,5 @@ pygame==1.9.4.dev0
 requests==2.19.1
 RPi.GPIO==0.6.3
 ruamel.yaml==0.15.64
-urllib3==1.23
+urllib3==1.26.5
 web.py==0.40.dev1
